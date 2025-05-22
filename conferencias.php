@@ -1,6 +1,6 @@
 <?php
 session_start();
-$conn = new mysqli("localhost", "root", "", "SpeakerZone_db");
+$conn = new mysqli("172.17.0.2", "root", "password", "SpeakerZone_db");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
 // Obtener todas las conferencias con nombre del presentador
@@ -24,7 +24,6 @@ $conn->close();
     <style>
         .conferencias-section {
             margin: 80px auto 0 auto;
-            max-width: 800px;
             background: #fff;
             border-radius: 18px;
             box-shadow: 0 6px 32px rgba(80,86,150,0.09), 0 1.5px 3px rgba(0,0,0,0.03);
@@ -38,16 +37,17 @@ $conn->close();
             list-style: none;
             padding: 0;
             margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .conferencia-item {
-            border-bottom: 1px solid #f3f4f6;
-            padding: 18px 0;
+            border: 2px solid #0000004a;
+            border-radius: 8px;
+            padding: 0 0 18px;
             display: flex;
             flex-direction: column;
             gap: 4px;
-        }
-        .conferencia-item:last-child {
-            border-bottom: none;
         }
         .conferencia-titulo {
             font-size: 1.18em;
@@ -64,11 +64,19 @@ $conn->close();
             color: #374151;
             font-size: 1em;
         }
+        img {
+            width: 400px;
+        }
         @media (max-width: 700px) {
             .conferencias-section {
                 max-width: 99vw;
                 padding: 22px 5vw 16px 5vw;
             }
+        }
+        .conferencia-titulo {
+            margin: 0;
+            font-size: 2rem;
+            color: #00f;
         }
     </style>
 </head>
@@ -81,7 +89,8 @@ $conn->close();
         <ul class="conferencias-list">
             <?php foreach ($conferencias as $c): ?>
             <li class="conferencia-item">
-                <div class="conferencia-titulo"><?= htmlspecialchars($c["titulo"]) ?></div>
+                <img src="https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F933364723%2F563548210565%2F1%2Foriginal.20250111-225746?w=600&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C101%2C1600%2C800&s=d88d2de624e45fe8fdb98b91b4f7c16b" alt="">
+                <p class="conferencia-titulo"><?= htmlspecialchars($c["titulo"]) ?></p>
                 <div class="conferencia-meta">
                     <span><?= ucfirst($c["modalidad"]) ?></span> |
                     <span><?= date('d/m/Y H:i', strtotime($c["fecha"])) ?></span> |

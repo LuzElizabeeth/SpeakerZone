@@ -1,7 +1,7 @@
 <?php
 session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $conn = new mysqli("localhost", "root", "", "SpeakerZone_db");
+    $conn = new mysqli("172.17.0.2", "root", "password", "SpeakerZone_db");
     if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
     $email = $conn->real_escape_string($_POST["email"]);

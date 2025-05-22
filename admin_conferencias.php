@@ -1,12 +1,12 @@
 <?php
 session_start();
 // Solo administradores pueden acceder
-if (!isset($_SESSION["usuario_tipo"]) || $_SESSION["usuario_tipo"] !== "admin") {
+if (!isset($_SESSION["usuario_tipo"]) || $_SESSION["usuario_tipo"] !== "presentador") {
     header("Location: login.php");
     exit();
 }
 
-$conn = new mysqli("localhost", "root", "", "SpeakerZone_db");
+$conn = new mysqli("172.17.0.2", "root", "password", "SpeakerZone_db");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
 // Crear nueva conferencia
