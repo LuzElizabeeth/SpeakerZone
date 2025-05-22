@@ -10,18 +10,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "SELECT * FROM usuarios WHERE email='$email'";
     $result = $conn->query($sql);
     if ($result && $row = $result->fetch_assoc()) {
-        if (password_verify($password, $row["password"])) {
+        if (!password_verify($password, $row["password"])) {
+            $error = "Contraseña incorrecta.";
+        } elseif (!$row["confirmado"]) {
+            $error = "Debes confirmar tu cuenta antes de iniciar sesión. Revisa tu correo.";
+        } else {
             $_SESSION["usuario_id"] = $row["id"];
             $_SESSION["usuario_nombre"] = $row["nombre"];
             $_SESSION["usuario_tipo"] = $row["tipo"];
             header("Location: home.php");
             exit();
-        } else {
-            $error = "Contraseña incorrecta.";
         }
     } else {
         $error = "Usuario no encontrado.";
     }
+
     $conn->close();
 }
 ?>
