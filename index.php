@@ -1,172 +1,286 @@
-<?php
-// Ejemplo de conferencias (en producción, obtén esto de la base de datos)
-$conferencias = [
-    [
-        "titulo" => "Inteligencia Artificial en la Educación",
-        "descripcion" => "Explora cómo la IA está revolucionando el aprendizaje.",
-        "fecha" => "2025-06-05",
-        "ponente" => "Dra. Ana Robles"
-    ],
-    [
-        "titulo" => "Desarrollo Web Moderno",
-        "descripcion" => "Tendencias y herramientas para el 2025.",
-        "fecha" => "2025-06-10",
-        "ponente" => "Ing. Luis Méndez"
-    ]
-];
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Bienvenido a SpeakerZone</title>
+    <title>SpeakerZone - Tu plataforma de conferencias</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Barra superior */
-        .topbar {
+        body {margin:0;padding:0; box-sizing:border-box;}
+        .navbar {
             width: 100%;
+            height: 70px;
             display: flex;
-            justify-content: flex-end;
             align-items: center;
-            padding: 22px 40px 0 0;
-            box-sizing: border-box;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 10;
+            justify-content: space-between;
+            background: #fff;
+            box-shadow: 0 0 14px 0 #c7d2fe44;
+            position: fixed;
+            top: 0; left: 0; z-index: 100;
+            padding: 0 40px;
         }
-        .topbar .btn {
-            margin-left: 10px;
+        .navbar-logo {
+            height: 54px;
+            display: flex;
+            align-items: center;
         }
-        .btn {
-            padding: 9px 24px;
+        .navbar-logo img {
+            height: 38px;
+            margin-right: 9px;
+        }
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+        .navbar-links a {
+            color: #3730a3;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        .navbar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .navbar-actions .btn {
+            padding: 7px 20px;
+            border-radius: 7px;
+            border: none;
             background: linear-gradient(90deg,#6366f1 0%, #06b6d4 100%);
             color: #fff;
-            border: none;
-            border-radius: 7px;
-            font-size: 16px;
             font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
-            box-shadow: 0 1px 4px rgba(80,86,150,0.07);
-            transition: background 0.15s, transform 0.1s;
             text-decoration: none;
-            display: inline-block;
+            transition: background 0.13s, box-shadow 0.13s;
+            box-shadow: 0 2px 8px #6366f11a;
         }
-        .btn:hover {
-            background: linear-gradient(90deg,#312e81 0%, #0ea5e9 100%);
-            transform: scale(1.04);
-            color: #fff;
+        .navbar-actions .btn.secondary {
+            background: #f1f5f9;
+            color: #312e81;
+            border: 1.5px solid #6366f1;
         }
-        /* Hero principal */
         .hero {
-            margin: 110px auto 0 auto;
-            max-width: 600px;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 6px 32px rgba(80,86,150,0.12), 0 1.5px 3px rgba(0,0,0,0.04);
-            padding: 48px 36px 38px 36px;
+            padding-top: 110px;
+            padding-bottom: 60px;
+            background: linear-gradient(120deg, #e0e7ff 0%, #f0fdfa 100%);
             text-align: center;
         }
-        .hero h1 {
-            font-size: 2.4em;
+        .hero-title {
+            font-size: 2.6em;
+            font-weight: bold;
             color: #312e81;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
-        .hero p {
+        .hero-desc {
             color: #374151;
-            font-size: 1.13em;
-            margin-bottom: 32px;
-            line-height: 1.7;
+            font-size: 1.25em;
+            margin-bottom: 30px;
+        }
+        .hero-btns {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 38px;
         }
         .hero-img {
-            width: 110px;
-            margin-bottom: 18px;
-            filter: drop-shadow(0 5px 15px #6366f13a);
-        }
-        .accent {
-            color: #0ea5e9;
-            font-weight: bold;
-        }
-        /* Lista de conferencias */
-        .conferencias-section {
-            margin: 40px auto 0 auto;
-            max-width: 750px;
-            background: #fff;
+            max-width: 520px;
+            width: 95vw;
+            margin: 0 auto;
             border-radius: 18px;
-            box-shadow: 0 6px 32px rgba(80,86,150,0.11), 0 1.5px 3px rgba(0,0,0,0.03);
-            padding: 34px 30px 28px 30px;
+            box-shadow: 0 8px 38px #818cf833;
+            display:block;
         }
-        .conferencias-section h2 {
-            color: #4338ca;
-            margin-bottom: 16px;
+        .section {
+            max-width: 1100px;
+            margin: 60px auto 0 auto;
+            padding: 0 3vw;
+            text-align: center;
         }
-        .conferencias-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .conferencia-item {
-            border-bottom: 1px solid #f3f4f6;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .conferencia-item:last-child {
-            border-bottom: none;
-        }
-        .conferencia-titulo {
-            font-size: 1.17em;
+        .section-title {
+            font-size: 2em;
             color: #312e81;
+            margin-bottom: 18px;
+        }
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 38px;
+            margin-top: 30px;
+        }
+        .feature {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 22px #6366f118;
+            padding: 30px 22px;
+            max-width: 320px;
+            flex: 1 1 250px;
+            min-width: 210px;
+        }
+        .feature-icon {
+            font-size: 2.3em;
+            margin-bottom: 12px;
+            color: #06b6d4;
+        }
+        .feature-title {
+            font-size: 1.15em;
             font-weight: bold;
-        }
-        .conferencia-desc {
+            margin-bottom: 8px;
             color: #374151;
+        }
+        .feature-desc {
             font-size: 1em;
+            color: #6b7280;
         }
-        .conferencia-meta {
-            color: #0ea5e9;
-            font-size: 0.97em;
+        .footer {
+            margin-top: 60px;
+            background: #312e81;
+            color: #fff;
+            padding: 32px 0 18px 0;
+            text-align: center;
         }
-        @media (max-width: 700px) {
-            .hero, .conferencias-section {
-                max-width: 99vw;
-                padding: 22px 8vw 16px 8vw;
-            }
-            .topbar {
-                padding-right: 6vw;
-                padding-top: 12px;
-            }
+        .footer a {color:#a5b4fc;}
+        @media (max-width: 800px) {
+            .features {flex-direction:column;gap:18px;}
+            .navbar {padding: 0 10vw;}
+        }
+        @media (max-width: 600px) {
+            .hero-title {font-size: 1.5em;}
+            .section-title {font-size:1.18em;}
+            .feature {padding:18px 8px;}
+            .navbar {padding: 0 2vw;}
         }
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <a href="login.php" class="btn">Iniciar sesión</a>
-        <a href="register.php" class="btn">Registrarse</a>
+    <!-- Barra de navegación -->
+    <div class="navbar">
+        <div class="navbar-logo">
+            <img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png" alt="Logo SpeakerZone">
+            <span style="font-size:1.21em;font-weight:bold;color:#312e81;">SpeakerZone</span>
+        </div>
+        <div class="navbar-links">
+            <a href="#como-funciona">Cómo funciona</a>
+            <a href="#ventajas">Ventajas</a>
+            <a href="#conferencias">Conferencias</a>
+        </div>
+        <div class="navbar-actions">
+            <a href="login.php" class="btn secondary">Iniciar sesión</a>
+            <a href="register.php" class="btn">Crear cuenta</a>
+        </div>
     </div>
-    <div class="hero">
-        <img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png" alt="Logo SpeakerZone" class="hero-img" />
-        <h1>Bienvenido a <span class="accent">SpeakerZone</span></h1>
-        <p>
-            La plataforma universitaria donde presentadores y asistentes se conectan para compartir ideas y gestionar conferencias.<br><br>
-            <b>Descubre eventos, aprende y haz networking con otros estudiantes y expertos.</b>
-        </p>
-    </div>
-    <div class="conferencias-section">
-        <h2>Conferencias disponibles</h2>
-        <ul class="conferencias-list">
-            <?php foreach ($conferencias as $c): ?>
-            <li class="conferencia-item">
-                <div class="conferencia-titulo"><?= htmlspecialchars($c["titulo"]) ?></div>
-                <div class="conferencia-desc"><?= htmlspecialchars($c["descripcion"]) ?></div>
-                <div class="conferencia-meta">
-                    <span>Fecha: <?= htmlspecialchars($c["fecha"]) ?></span> |
-                    <span>Ponente: <?= htmlspecialchars($c["ponente"]) ?></span>
+
+    <!-- Hero principal -->
+    <section class="hero">
+        <div class="hero-title">Gestiona tus <span style="color:#06b6d4;">conferencias universitarias</span> en un solo lugar</div>
+        <div class="hero-desc">
+            SpeakerZone conecta ponentes y asistentes para crear eventos inolvidables.<br>
+            Organiza, asiste y haz networking en una plataforma moderna y fácil de usar.
+        </div>
+        <div class="hero-btns">
+            <a href="register.php" class="btn">Comenzar ahora</a>
+            <a href="conferencias.php" class="btn secondary">Ver conferencias</a>
+        </div>
+        <img class="hero-img" src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=900&q=80" alt="Conferencia universitara">
+    </section>
+
+    <!-- Sección Cómo funciona -->
+    <section class="section" id="como-funciona">
+        <div class="section-title">¿Cómo funciona SpeakerZone?</div>
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🎤</div>
+                <div class="feature-title">Para organizadores</div>
+                <div class="feature-desc">
+                    Crea y gestiona conferencias, asigna ponentes, controla inscripciones y obtén reportes en tiempo real.
                 </div>
-            </li>
-            <?php endforeach; ?>
-        </ul>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🧑‍💻</div>
+                <div class="feature-title">Para ponentes</div>
+                <div class="feature-desc">
+                    Presenta tus charlas, comparte materiales y conecta con tu audiencia de manera sencilla.
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🙋‍♀️</div>
+                <div class="feature-title">Para asistentes</div>
+                <div class="feature-desc">
+                    Descubre eventos, inscríbete a conferencias y obtén certificados de participación.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Ventajas -->
+    <section class="section" id="ventajas">
+        <div class="section-title">Ventajas de usar SpeakerZone</div>
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⏱️</div>
+                <div class="feature-title">Ahorra tiempo</div>
+                <div class="feature-desc">
+                    Automatiza tareas administrativas, recordatorios y gestión de inscripciones.
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-title">Plataforma segura</div>
+                <div class="feature-desc">
+                    Tus datos y los de tus asistentes están siempre protegidos.
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <div class="feature-title">Acceso multiplataforma</div>
+                <div class="feature-desc">
+                    Usa SpeakerZone desde tu computadora, tablet o celular sin instalar nada.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Conferencias disponibles -->
+    <section class="section" id="conferencias">
+        <div class="section-title">Conferencias destacadas</div>
+        <div class="features">
+            <div class="feature">
+                <div class="feature-title">Inteligencia Artificial en la Educación</div>
+                <div class="feature-desc">
+                    28/05/2025 - 17:00<br>
+                    Modalidad: En línea<br>
+                    Ponente: Dra. Ana Robles
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-title">Desarrollo Web Moderno</div>
+                <div class="feature-desc">
+                    01/06/2025 - 11:00<br>
+                    Modalidad: Presencial<br>
+                    Ponente: Ing. Luis Méndez
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-title">Comunicación Efectiva para Líderes</div>
+                <div class="feature-desc">
+                    10/06/2025 - 15:30<br>
+                    Modalidad: En línea<br>
+                    Ponente: Lic. Marisol Pérez
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:24px;">
+            <a href="conferencias.php" class="btn">Ver todas las conferencias</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="footer">
+        &copy; <?=date('Y')?> SpeakerZone · Plataforma de conferencias universitarias
+        <br>
+        <a href="mailto:soporte@speakerzone.com">soporte@speakerzone.com</a>
     </div>
 </body>
 </html>
