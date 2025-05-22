@@ -236,7 +236,7 @@
         </div>
         <div class="navbar-actions">
             <a href="login.php" class="btn secondary">Iniciar sesión</a>
-            <a href="register.php" class="btn">Crear cuenta</a>
+            <a href="register.php" class="btn">Registrarse</a>
             <div class="navbar-toggle" id="navbarToggle" aria-label="Abrir menú">
                 <span></span><span></span><span></span>
             </div>
@@ -246,7 +246,7 @@
     <!-- Hero principal -->
     <section class="hero" data-aos="fade-up">
         <div class="hero-title">
-            Tu espacio para <span style="color:#06b6d4;">conferencias universitarias</span>
+            Tu espacio para <span style="color:#06b6d4;">conferencias de tu interés </span>
         </div>
         <div class="hero-desc">
             Organiza, asiste y participa en conferencias de manera sencilla.<br>
@@ -268,12 +268,12 @@
                 <div class="feature-icon">🎤</div>
                 <div class="feature-title">Organizadores</div>
                 <div class="feature-desc">
-                    Crea conferencias, gestiona horarios y asigna ponentes con facilidad.
+                    Crea conferencias, gestiona horarios y asigna presentadores con facilidad.
                 </div>
             </div>
             <div class="feature" data-aos="fade-up" data-aos-delay="80">
                 <div class="feature-icon">🧑‍💻</div>
-                <div class="feature-title">Ponentes</div>
+                <div class="feature-title">Presentadores</div>
                 <div class="feature-desc">
                     Comparte tus conocimientos y conecta con la audiencia universitaria.
                 </div>
@@ -327,7 +327,7 @@
                 <div class="feature-desc">
                     28/05/2025 · 17:00<br>
                     Modalidad: En línea<br>
-                    Ponente: Dra. Ana Robles
+                    Presentador: Dra. Ana Robles
                 </div>
             </div>
             <div class="feature" data-aos="zoom-in-up" data-aos-delay="120">
@@ -335,7 +335,7 @@
                 <div class="feature-desc">
                     01/06/2025 · 11:00<br>
                     Modalidad: Presencial<br>
-                    Ponente: Ing. Luis Méndez
+                    Presentador: Ing. Luis Méndez
                 </div>
             </div>
         </div>
@@ -346,9 +346,9 @@
 
     <!-- Footer -->
     <div class="footer">
-        &copy; <?=date('Y')?> SpeakerZone · Plataforma de conferencias universitarias
+        &copy; <?=date('Y')?> SpeakerZone · Tu plataforma de conferencias 
         <br>
-        <a href="mailto:soporte@speakerzone.com">soporte@speakerzone.com</a>
+        <a href="mailto:speakerzone0@gmail.com">speakerzone0@gmail.com</a>
     </div>
 
     <!-- AOS Animate On Scroll JS -->
