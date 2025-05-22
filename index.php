@@ -359,9 +359,9 @@
         let lastScrollTop = 0, navbar = document.getElementById('navbar');
         window.addEventListener('scroll', function(){
             let st = window.pageYOffset || document.documentElement.scrollTop;
-            if(st > lastScrollTop && st > 60){ // scroll down
+            if(st > lastScrollTop && st > 60){
                 navbar.style.top = '-70px';
-            } else { // scroll up
+            } else {
                 navbar.style.top = '0';
             }
             lastScrollTop = st <= 0 ? 0 : st;
