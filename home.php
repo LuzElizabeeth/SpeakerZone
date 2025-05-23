@@ -55,7 +55,10 @@ $result = $conn->query($sql);
         <?php endwhile; ?>
     </table>
     <?php if ($_SESSION["usuario_tipo"] == "presentador"): ?>
-        <p><a href="crear_conferencia.php">Crear nueva conferencia</a></p>
+        <!-- Cambiado a formulario que redirecciona a admin_conferencias.php -->
+        <form method="get" action="admin_conferencias.php" style="margin-top:20px;">
+            <button type="submit">Crear nueva conferencia</button>
+        </form>
     <?php endif; ?>
     <p><a href="logout.php">Cerrar sesión</a></p>
 </body>
