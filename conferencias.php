@@ -89,7 +89,7 @@ $conn->close();
         <ul class="conferencias-list">
             <?php foreach ($conferencias as $c): ?>
             <li class="conferencia-item">
-                <img src="TDAH.jpg" alt="Logo de la conferencia" width="300">
+                <img src="conferenciasimagen.jpg" alt="Logo de la conferencia" width="300">
                 <p class="conferencia-titulo"><?= htmlspecialchars($c["titulo"]) ?></p>
                 <div class="conferencia-meta">
                     <span><?= ucfirst($c["modalidad"]) ?></span> |
