@@ -232,7 +232,7 @@
         <div class="navbar-links" id="navbarLinks">
             <a href="#como-funciona">¿Cómo funciona?</a>
             <a href="#ventajas">Ventajas</a>
-            <a href="conferencias-list">Conferencias</a>
+            <a href="conferencias">Conferencias</a>
         </div>
         <div class="navbar-actions">
             <a href="login.php" class="btn secondary">Iniciar sesión</a>
