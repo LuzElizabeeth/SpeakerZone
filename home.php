@@ -5,7 +5,7 @@ if (!isset($_SESSION["usuario_id"])) {
     exit();
 }
 
-$conn = new mysqli("localhost", "root", "password", "SpeakerZone_db");
+$conn = new mysqli("localhost", "root", "", "SpeakerZone_db");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
 $sql = "SELECT c.*, u.nombre as presentador FROM conferencias c LEFT JOIN usuarios u ON c.presentador_id = u.id ORDER BY c.fecha DESC";
