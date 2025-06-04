@@ -1,6 +1,6 @@
 <?php
 session_start();
-$conn = new mysqli("localhost", "root", "", "SpeakerZone_db");
+$conn = new mysqli("172.17.0.2", "root", "password", "SpeakerZone_db");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
 // Obtener todas las conferencias con nombre del presentador
@@ -89,7 +89,7 @@ $conn->close();
         <ul class="conferencias-list">
             <?php foreach ($conferencias as $c): ?>
             <li class="conferencia-item">
-                <img src="conferenciasimagen.jpg" alt="Logo de la conferencia" width="300">
+                <img src="https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F933364723%2F563548210565%2F1%2Foriginal.20250111-225746?w=600&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C101%2C1600%2C800&s=d88d2de624e45fe8fdb98b91b4f7c16b" alt="">
                 <p class="conferencia-titulo"><?= htmlspecialchars($c["titulo"]) ?></p>
                 <div class="conferencia-meta">
                     <span><?= ucfirst($c["modalidad"]) ?></span> |
