@@ -36,15 +36,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Iniciar Sesión</h2>
-    <?php if (isset($error)) echo "<p style='color:red'>$error</p>"; ?>
-    <form method="POST">
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br>
-        <label>Contraseña:</label><br>
-        <input type="password" name="password" required><br><br>
-        <button type="submit">Ingresar</button>
-    </form>
-    <p>¿No tienes cuenta? <a href="register.php">Regístrate aquí</a></p>
+    <div class="container-bg">
+        <div class="form-card">
+            <h2>Iniciar Sesión</h2>
+            <?php if (isset($error)) echo "<p class='error-msg'>$error</p>"; ?>
+            <form method="POST" class="registro-form">
+                <label>Email:</label>
+                <input type="email" name="email" required>
+                <label>Contraseña:</label>
+                <input type="password" name="password" required>
+                <button type="submit">Ingresar</button>
+            </form>
+            <p class="login-link">¿No tienes cuenta? <a href="register.php">Regístrate aquí</a></p>
+        </div>
+    </div>
 </body>
 </html>

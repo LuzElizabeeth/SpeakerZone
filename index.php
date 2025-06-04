@@ -226,13 +226,13 @@
     <!-- Barra de navegación -->
     <div class="navbar" id="navbar">
         <div class="navbar-logo">
-            <img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png" alt="Logo SpeakerZone">
+            <img src="logo.jpeg" alt="Logo SpeakerZone">
             <span style="font-size:1.15em;font-weight:bold;color:#312e81;">SpeakerZone</span>
         </div>
         <div class="navbar-links" id="navbarLinks">
             <a href="#como-funciona">¿Cómo funciona?</a>
             <a href="#ventajas">Ventajas</a>
-            <a href="#conferencias">Conferencias</a>
+            <a href="conferencias-list">Conferencias</a>
         </div>
         <div class="navbar-actions">
             <a href="login.php" class="btn secondary">Iniciar sesión</a>
