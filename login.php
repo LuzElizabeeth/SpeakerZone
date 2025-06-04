@@ -48,6 +48,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="submit">Ingresar</button>
             </form>
             <p class="login-link">¿No tienes cuenta? <a href="register.php">Regístrate aquí</a></p>
+            <!-- Botón para regresar a la página de inicio -->
+            <div style="text-align:center; margin-top:20px;">
+                <a href="index.php" class="btn" style="background:#4a6fa5;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Regresar al inicio</a>
+            </div>
         </div>
     </div>
 </body>

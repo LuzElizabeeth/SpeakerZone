@@ -275,38 +275,40 @@ $result = $conn->query($sql);
                         </tr>
                     </thead>
                     <tbody>
-                    <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td data-label="Título">
-                                <strong><?php echo htmlspecialchars($row["titulo"]); ?></strong>
-                            </td>
-                            <td data-label="Descripción"><?php echo htmlspecialchars(substr($row["descripcion"], 0, 50)); ?><?php echo strlen($row["descripcion"]) > 50 ? '...' : ''; ?></td>
-                            <td data-label="Modalidad">
-                                <span class="badge <?php echo $row["modalidad"] == "Virtual" ? 'badge-online' : 'badge-presencial'; ?>">
-                                    <?php echo htmlspecialchars($row["modalidad"]); ?>
-                                </span>
-                            </td>
-                            <td data-label="Fecha"><?php echo date('d M Y', strtotime($row["fecha"])); ?></td>
-                            <td data-label="Lugar"><?php echo htmlspecialchars($row["lugar"]); ?></td>
-                            <td data-label="Presentador"><?php echo htmlspecialchars($row["presentador"]); ?></td>
-                            <td data-label="Acciones">
-                                <?php if ($_SESSION["usuario_tipo"] == "asistente"): ?>
-                                    <form method="POST" action="inscribirse.php" style="display:inline;">
-                                        <input type="hidden" name="conferencia_id" value="<?php echo $row["id"]; ?>">
-                                        <button type="submit" class="action-btn" title="Inscribirse a esta conferencia">
-                                            <i class="fas fa-user-plus"></i> Inscribirse
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
-                                <?php if ($_SESSION["usuario_tipo"] == "presentador" && $_SESSION["usuario_id"] == $row["presentador_id"]): ?>
-                                    <a href="editar_conferencia.php?id=<?php echo $row["id"]; ?>" class="action-link" title="Editar esta conferencia">
-                                        <i class="fas fa-edit"></i> Editar
-                                    </a>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                    </tbody>
+<?php while ($row = $result->fetch_assoc()): ?>
+    <tr>
+        <td data-label="Título">
+            <strong><?php echo htmlspecialchars($row["titulo"]); ?></strong>
+        </td>
+        <td data-label="Descripción">
+            <?php echo htmlspecialchars(substr($row["descripcion"], 0, 50)); ?>
+            <?php echo strlen($row["descripcion"]) > 50 ? '...' : ''; ?>
+        </td>
+        <td data-label="Modalidad">
+            <span class="badge <?php echo $row["modalidad"] == "Virtual" ? 'badge-online' : 'badge-presencial'; ?>">
+                <?php echo htmlspecialchars($row["modalidad"]); ?>
+            </span>
+        </td>
+        <td data-label="Fecha"><?php echo date('d M Y', strtotime($row["fecha"])); ?></td>
+        <td data-label="Lugar"><?php echo htmlspecialchars($row["lugar"]); ?></td>
+        <td data-label="Presentador"><?php echo htmlspecialchars($row["presentador"]); ?></td>
+        <td data-label="Acciones">
+            <?php if ($_SESSION["usuario_tipo"] == "asistente"): ?>
+                <form method="POST" action="inscribirse.php" style="display:inline;">
+                    <input type="hidden" name="conferencia_id" value="<?php echo $row["id"]; ?>">
+                    <button type="submit" class="action-btn" title="Inscribirse a esta conferencia">
+                        <i class="fas fa-user-plus"></i> Inscribirse
+                    </button>
+                </form>
+            <?php elseif ($_SESSION["usuario_tipo"] == "presentador" && $_SESSION["usuario_id"] == $row["presentador_id"]): ?>
+                <a href="editar_conferencia.php?id=<?php echo $row["id"]; ?>" class="action-link" title="Editar esta conferencia">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            <?php endif; ?>
+        </td>
+    </tr>
+<?php endwhile; ?>
+</tbody>
                 </table>
             </div>
             
