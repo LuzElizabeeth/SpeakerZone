@@ -7,27 +7,21 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Conexión a la base de datos
     $conn = new mysqli("localhost", "root", "", "SpeakerZone_db");
     if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-    // Recoger datos del formulario
     $nombre = $conn->real_escape_string($_POST["nombre"]);
     $email = $conn->real_escape_string($_POST["email"]);
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
     $tipo = $conn->real_escape_string($_POST["tipo"]);
 
-    // Generar token de confirmación y fecha de expiración (ej. 24h)
     $token = bin2hex(random_bytes(16));
-    $expira = date("Y-m-d H:i:s", time() + 86400); // +1 día
+    $expira = date("Y-m-d H:i:s", time() + 86400);
 
-    // Insertar en la base de datos
     $sql = "INSERT INTO usuarios (nombre, email, password, tipo, token_confirmacion, token_expira) 
             VALUES ('$nombre', '$email', '$password', '$tipo', '$token', '$expira')";
 
     if ($conn->query($sql) === TRUE) {
-        // Enviar correo de confirmación
-
         $mail = new PHPMailer(true);
 
         try {
@@ -35,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
             $mail->Username = 'speakerzone0@gmail.com';
-            $mail->Password = 'mhmt erxk nioq lszk'; // NO tu clave normal
+            $mail->Password = 'mhmt erxk nioq lszk';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
 
@@ -73,23 +67,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Registro a la SpeakerZone</h2>
-    <?php if (isset($error)) echo "<p style='color:red'>$error</p>"; ?>
-    <form method="POST">
-        <label>Nombre:</label><br>
-        <input type="text" name="nombre" required><br>
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br>
-        <label>Contraseña:</label><br>
-        <input type="password" name="password" required><br>
-        <label>Tipo de usuario:</label><br>
-        <select name="tipo" required>
-            <option value="presentador">Presentador</option>
-            <option value="asistente">Asistente</option>
-            <option value="organizador">Organizador</option>
-        </select><br><br>
-        <button type="submit">Registrarse</button>
-    </form>
-    <p>¿Ya tienes cuenta? <a href="login.php">Inicia sesión</a></p>
+    <div class="container-bg">
+        <div class="form-card">
+            <h2>Registro a SpeakerZone</h2>
+            <?php if (isset($error)) echo "<p class='error-msg'>$error</p>"; ?>
+            <form method="POST" class="registro-form">
+                <label>Nombre:</label>
+                <input type="text" name="nombre" required>
+                <label>Email:</label>
+                <input type="email" name="email" required>
+                <label>Contraseña:</label>
+                <input type="password" name="password" required>
+                <label>Tipo de usuario:</label>
+                <select name="tipo" required>
+                    <option value="presentador">Presentador</option>
+                    <option value="asistente">Asistente</option>
+                    <option value="organizador">Organizador</option>
+                </select>
+                <button type="submit">Registrarse</button>
+            </form>
+            <p class="login-link">¿Ya tienes cuenta? <a href="login.php">Inicia sesión</a></p>
+        </div>
+    </div>
 </body>
 </html>

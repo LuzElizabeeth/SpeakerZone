@@ -1,83 +1,106 @@
-body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(120deg, #e0e7ff 0%, #f0fdfa 100%);
+body, html {
+    height: 100%;
     margin: 0;
     padding: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #6f86d6 0%, #48c6ef 100%);
+}
+
+.container-bg {
     min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.container {
-    width: 100%;
-    max-width: 400px;
-    margin: 60px auto;
+
+.form-card {
     background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 6px 32px rgba(80,86,150,0.10), 0 1.5px 3px rgba(0,0,0,0.04);
-    padding: 32px 30px 24px 30px;
+    padding: 2.5rem 2.5rem 2rem 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    max-width: 370px;
+    width: 100%;
     text-align: center;
+    position: relative;
+    animation: fadeIn 0.9s;
 }
-h2 {
-    color: #312e81;
-    margin-bottom: 20px;
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-30px);}
+    to   { opacity: 1; transform: translateY(0);}
 }
-label {
-    display: block;
+
+.form-card h2 {
+    margin-bottom: 1.2rem;
+    color: #48466d;
+}
+
+.registro-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.registro-form label {
     text-align: left;
-    margin: 10px 0 5px 4px;
-    color: #4338ca;
-    font-size: 15px;
+    font-weight: 500;
+    color: #48466d;
 }
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 14px;
-    border: 1px solid #c7d2fe;
-    border-radius: 7px;
-    font-size: 16px;
-    background: #f8fafc;
+
+.registro-form input,
+.registro-form select {
+    padding: 0.5rem 0.8rem;
+    border: 1px solid #cfd8dc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #f6f9fb;
+    transition: border 0.2s;
 }
-button {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(90deg,#6366f1 0%, #06b6d4 100%);
+.registro-form input:focus,
+.registro-form select:focus {
+    border: 1.5px solid #48c6ef;
+    outline: none;
+}
+
+.registro-form button {
+    margin-top: 1rem;
+    padding: 0.6rem 0;
+    background: linear-gradient(90deg, #48c6ef 0%, #6f86d6 100%);
     color: #fff;
+    font-size: 1.1rem;
     border: none;
-    border-radius: 7px;
-    font-size: 17px;
-    font-weight: bold;
+    border-radius: 6px;
     cursor: pointer;
-    margin-top: 10px;
-    transition: transform 0.07s;
+    transition: background 0.2s, transform 0.2s;
+    font-weight: 600;
+    letter-spacing: .5px;
 }
-button:hover {
-    transform: scale(1.04);
-    background: linear-gradient(90deg,#312e81 0%, #0ea5e9 100%);
+.registro-form button:hover {
+    background: linear-gradient(90deg, #6f86d6 0%, #48c6ef 100%);
+    transform: translateY(-2px) scale(1.04);
 }
-a {
-    color: #0ea5e9;
+
+.login-link {
+    margin-top: 1.2rem;
+    font-size: 0.98rem;
+    color: #48466d;
+}
+
+.login-link a {
+    color: #6f86d6;
     text-decoration: none;
+    font-weight: 600;
 }
-a:hover {
+
+.login-link a:hover {
     text-decoration: underline;
 }
-.message {
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 16px;
-    font-weight: 500;
-}
-.message.error {
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1.5px solid #fecaca;
-}
-.message.success {
-    background: #d1fae5;
-    color: #065f46;
-    border: 1.5px solid #6ee7b7;
-}
-@media (max-width: 500px) {
-    .container {
-        max-width: 98vw;
-        padding: 18px 7vw 10px 7vw;
-    }
+
+.error-msg {
+    color: #d32f2f;
+    background: #ffeaea;
+    border-radius: 5px;
+    padding: 0.4rem 0.8rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
 }
