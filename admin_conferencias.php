@@ -1,7 +1,6 @@
 <?php
 session_start();
-// Solo administradores pueden acceder
-if (!isset($_SESSION["usuario_tipo"]) || $_SESSION["usuario_tipo"] !== "presentador") {
+if (!isset($_SESSION["usuario_id"]) || $_SESSION["usuario_tipo"] != "presentador") {
     header("Location: login.php");
     exit();
 }
@@ -9,107 +8,268 @@ if (!isset($_SESSION["usuario_tipo"]) || $_SESSION["usuario_tipo"] !== "presenta
 $conn = new mysqli("localhost", "root", "", "SpeakerZone_db");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
-// Crear nueva conferencia
-if (isset($_POST["crear"])) {
-    $titulo = $conn->real_escape_string($_POST["titulo"]);
-    $descripcion = $conn->real_escape_string($_POST["descripcion"]);
-    $modalidad = $conn->real_escape_string($_POST["modalidad"]);
-    $fecha = $conn->real_escape_string($_POST["fecha"] . " " . $_POST["hora"]);
-    $lugar = $conn->real_escape_string($_POST["lugar"]);
-    $presentador_id = intval($_POST["presentador_id"]);
+// Determinar el modo de operación
+$mode = 'new';
+$conferencia_id = null;
+$conferencia = null;
 
-    $sql = "INSERT INTO conferencias (titulo, descripcion, modalidad, fecha, lugar, presentador_id) VALUES ('$titulo', '$descripcion', '$modalidad', '$fecha', '$lugar', $presentador_id)";
-    $conn->query($sql);
+if (isset($_GET['conferencia_id'])) {
+    $mode = 'edit';
+    $conferencia_id = intval($_GET['conferencia_id']);
+    
+    // Obtener datos de la conferencia y verificar propiedad
+    $stmt = $conn->prepare("SELECT * FROM conferencias WHERE id = ? AND presentador_id = ?");
+    $stmt->bind_param("ii", $conferencia_id, $_SESSION['usuario_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $conferencia = $result->fetch_assoc();
+    } else {
+        header("Location: index.php?msg=No tienes permiso para editar esta conferencia");
+        exit();
+    }
+} elseif (isset($_GET['mode']) && $_GET['mode'] == 'list') {
+    $mode = 'list';
+    
+    // Obtener todas las conferencias del presentador
+    $stmt = $conn->prepare("SELECT * FROM conferencias WHERE presentador_id = ? ORDER BY fecha DESC");
+    $stmt->bind_param("i", $_SESSION['usuario_id']);
+    $stmt->execute();
+    $conferencias = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
-// Eliminar conferencia
-if (isset($_GET["eliminar"])) {
-    $id = intval($_GET["eliminar"]);
-    $conn->query("DELETE FROM conferencias WHERE id=$id");
+// Procesar formulario de guardar
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $titulo = $_POST['titulo'] ?? '';
+    $descripcion = $_POST['descripcion'] ?? '';
+    $modalidad = $_POST['modalidad'] ?? '';
+    $fecha = $_POST['fecha'] ?? '';
+    $lugar = $_POST['lugar'] ?? '';
+    $presentador_id = $_SESSION['usuario_id'];
+    
+    if ($mode == 'edit' && isset($_POST['conferencia_id'])) {
+        // Actualizar conferencia existente
+        $stmt = $conn->prepare("UPDATE conferencias SET titulo=?, descripcion=?, modalidad=?, fecha=?, lugar=? WHERE id=? AND presentador_id=?");
+        $stmt->bind_param("sssssii", $titulo, $descripcion, $modalidad, $fecha, $lugar, $_POST['conferencia_id'], $presentador_id);
+        $stmt->execute();
+        
+        header("Location: index.php?msg=Conferencia actualizada correctamente");
+        exit();
+    } else {
+        // Crear nueva conferencia
+        $stmt = $conn->prepare("INSERT INTO conferencias (titulo, descripcion, modalidad, fecha, lugar, presentador_id) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssi", $titulo, $descripcion, $modalidad, $fecha, $lugar, $presentador_id);
+        $stmt->execute();
+        
+        header("Location: index.php?msg=Conferencia creada correctamente");
+        exit();
+    }
 }
-
-// Obtener presentadores (usuarios tipo presentador)
-$presentadores = [];
-$res = $conn->query("SELECT id, nombre FROM usuarios WHERE tipo='presentador'");
-if ($res) while ($p = $res->fetch_assoc()) $presentadores[] = $p;
-
-// Obtener todas las conferencias
-$conferencias = [];
-$res = $conn->query(
-    "SELECT c.*, u.nombre as presentador_nombre 
-     FROM conferencias c 
-     LEFT JOIN usuarios u ON c.presentador_id = u.id 
-     ORDER BY c.fecha"
-);
-if ($res) while ($c = $res->fetch_assoc()) $conferencias[] = $c;
-
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gestión de Conferencias - Admin · SpeakerZone</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Conferencias - SpeakerZone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Usar los mismos estilos de index.php o personalizar según necesites */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f7fa;
+            color: #343a40;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #166088;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #4fc3f7;
+            padding-bottom: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            min-height: 120px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #166088;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #0d4b7a;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .conferencias-list {
+            margin-top: 2rem;
+        }
+        
+        .conferencia-item {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            background-color: #f8f9fa;
+        }
+        
+        .conferencia-item h3 {
+            margin-top: 0;
+            color: #166088;
+        }
+        
+        .conferencia-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        .actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="topbar">
-        <a href="logout.php" class="btn">Cerrar sesión</a>
-    </div>
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1>Gestión de Conferencias</h1>
-            <a href="index.php" class="btn">Volver a inicio</a>
-        </div>
-        <!-- Formulario para crear nueva conferencia -->
-        <form method="POST" class="conferencia-form">
-            <h2 style="color:#4338ca;">Crear nueva conferencia</h2>
-            <input type="text" name="titulo" placeholder="Título" required>
-            <textarea name="descripcion" placeholder="Descripción"></textarea>
-            <select name="modalidad" required>
-                <option value="">Selecciona modalidad</option>
-                <option value="en linea">En línea</option>
-                <option value="presencial">Presencial</option>
-            </select>
-            <label style="text-align:left;margin:0 0 4px 4px;">Fecha y hora</label>
-            <input type="date" name="fecha" required style="width:48%;display:inline-block;">
-            <input type="time" name="hora" required style="width:48%;display:inline-block;float:right;">
-            <input type="text" name="lugar" placeholder="Lugar">
-            <select name="presentador_id">
-                <option value="">Sin presentador</option>
-                <?php foreach($presentadores as $p): ?>
-                    <option value="<?= $p["id"] ?>"><?= htmlspecialchars($p["nombre"]) ?></option>
+    <div class="container">
+        <?php if ($mode == 'list'): ?>
+            <h1><i class="fas fa-tasks"></i> Mis Conferencias</h1>
+            
+            <a href="admin_conferencias.php" class="btn"><i class="fas fa-plus"></i> Nueva Conferencia</a>
+            
+            <div class="conferencias-list">
+                <?php foreach ($conferencias as $conf): ?>
+                    <div class="conferencia-item">
+                        <h3><?php echo htmlspecialchars($conf['titulo']); ?></h3>
+                        <p><?php echo htmlspecialchars($conf['descripcion']); ?></p>
+                        <div class="conferencia-meta">
+                            <span><i class="fas fa-calendar"></i> <?php echo date('d M Y', strtotime($conf['fecha'])); ?></span>
+                            <span><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($conf['lugar']); ?></span>
+                            <span><i class="fas fa-network-wired"></i> <?php echo htmlspecialchars($conf['modalidad']); ?></span>
+                        </div>
+                        <div class="actions">
+                            <a href="admin_conferencias.php?conferencia_id=<?php echo $conf['id']; ?>" class="btn">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <form method="POST" action="eliminar_conferencia.php" style="display:inline;">
+                                <input type="hidden" name="conferencia_id" value="<?php echo $conf['id']; ?>">
+                                <button type="submit" class="btn btn-secondary" onclick="return confirm('¿Estás seguro de eliminar esta conferencia?');">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
-            </select>
-            <button type="submit" name="crear" class="btn">Crear conferencia</button>
-        </form>
-        <!-- Tabla de conferencias existentes -->
-        <h2 style="color:#4338ca;">Conferencias existentes</h2>
-        <table class="conferencias-table">
-            <tr>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Modalidad</th>
-                <th>Fecha y Hora</th>
-                <th>Lugar</th>
-                <th>Presentador</th>
-                <th>Acciones</th>
-            </tr>
-            <?php foreach ($conferencias as $c): ?>
-            <tr>
-                <td><?=htmlspecialchars($c["titulo"])?></td>
-                <td><?=htmlspecialchars($c["descripcion"])?></td>
-                <td><?=htmlspecialchars($c["modalidad"])?></td>
-                <td><?=date('Y-m-d H:i', strtotime($c["fecha"]))?></td>
-                <td><?=htmlspecialchars($c["lugar"])?></td>
-                <td><?=htmlspecialchars($c["presentador_nombre"] ?? '—')?></td>
-                <td class="acciones">
-                    <a href="editar_conferencia.php?id=<?=$c["id"]?>" class="edit-link">Editar</a>
-                    <a href="admin_conferencias.php?eliminar=<?=$c["id"]?>" class="danger" onclick="return confirm('¿Eliminar esta conferencia?');">Eliminar</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
+            </div>
+            
+        <?php else: ?>
+            <h1>
+                <i class="fas fa-<?php echo $mode == 'edit' ? 'edit' : 'plus-circle'; ?>"></i> 
+                <?php echo $mode == 'edit' ? 'Editar Conferencia' : 'Nueva Conferencia'; ?>
+            </h1>
+            
+            <form method="POST" action="admin_conferencias.php<?php echo $mode == 'edit' ? '?conferencia_id='.$conferencia_id : ''; ?>">
+                <?php if ($mode == 'edit'): ?>
+                    <input type="hidden" name="conferencia_id" value="<?php echo $conferencia_id; ?>">
+                <?php endif; ?>
+                
+                <div class="form-group">
+                    <label for="titulo">Título:</label>
+                    <input type="text" id="titulo" name="titulo" required 
+                           value="<?php echo $mode == 'edit' ? htmlspecialchars($conferencia['titulo']) : ''; ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea id="descripcion" name="descripcion" required><?php 
+                        echo $mode == 'edit' ? htmlspecialchars($conferencia['descripcion']) : ''; 
+                    ?></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modalidad">Modalidad:</label>
+                    <select id="modalidad" name="modalidad" required>
+                        <option value="Presencial" <?php 
+                            echo ($mode == 'edit' && $conferencia['modalidad'] == 'Presencial') ? 'selected' : ''; 
+                        ?>>Presencial</option>
+                        <option value="Virtual" <?php 
+                            echo ($mode == 'edit' && $conferencia['modalidad'] == 'Virtual') ? 'selected' : ''; 
+                        ?>>Virtual</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha" name="fecha" required 
+                           value="<?php echo $mode == 'edit' ? htmlspecialchars($conferencia['fecha']) : ''; ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="lugar">Lugar (o enlace si es virtual):</label>
+                    <input type="text" id="lugar" name="lugar" required 
+                           value="<?php echo $mode == 'edit' ? htmlspecialchars($conferencia['lugar']) : ''; ?>">
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i> <?php echo $mode == 'edit' ? 'Actualizar' : 'Crear'; ?>
+                </button>
+                
+                <a href="index.php" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        <?php endif; ?>
     </div>
 </body>
 </html>
+<?php $conn->close(); ?>
