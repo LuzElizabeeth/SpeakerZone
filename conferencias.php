@@ -1,6 +1,6 @@
 <?php
 session_start();
-$conn = new mysqli("172.17.0.2", "root", "", "SpeakerZone_db");
+$conn = new mysqli("172.17.0.2", "root", "password", "SpeakerZone_db");
 if ($conn->connect_error) die("Error de conexión: " . $conn->connect_error);
 
 // Obtener todas las conferencias con nombre del presentador
