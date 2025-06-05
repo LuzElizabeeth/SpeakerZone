@@ -15,47 +15,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
     $tipo = $conn->real_escape_string($_POST["tipo"]);
 
-    $token = bin2hex(random_bytes(16));
-    $expira = date("Y-m-d H:i:s", time() + 86400);
-
-    $sql = "INSERT INTO usuarios (nombre, email, password, tipo, token_confirmacion, token_expira) 
-            VALUES ('$nombre', '$email', '$password', '$tipo', '$token', '$expira')";
-
-    if ($conn->query($sql) === TRUE) {
-        $mail = new PHPMailer(true);
-
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'speakerzone0@gmail.com';
-            $mail->Password = 'mhmt erxk nioq lszk';
-            $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
-
-            $mail->setFrom('TU_CORREO@gmail.com', 'SpeakerZone');
-            $mail->addAddress($email, $nombre);
-
-            $mail->isHTML(true);
-            $mail->Subject = 'Confirma tu cuenta en SpeakerZone';
-            $mail->Body    = "
-                <h2>Hola, $nombre</h2>
-                <p>Gracias por registrarte en SpeakerZone.</p>
-                <p>Tu token de confirmacion es el siguiente. No lo compartas con nadie.</p>
-                <b>$token</b>
-                <p>Este enlace expirará en 24 horas.</p>
-            ";
-
-            $mail->send();
-            header("Location: confirmar.php");
-            exit();
-        } catch (Exception $e) {
-            $error = "No se pudo enviar el correo de confirmación. Error: " . $mail->ErrorInfo;
-        }
+    // Verificar si el email ya está registrado
+    $check = $conn->query("SELECT id FROM usuarios WHERE email = '$email' LIMIT 1");
+    if ($check && $check->num_rows > 0) {
+        $error = "El correo ya está registrado. <a href='login.php'>Inicia sesión</a> o utiliza otro correo.";
     } else {
-        $error = "Error al registrar: " . $conn->error;
-    }
+        $token = bin2hex(random_bytes(16));
+        $expira = date("Y-m-d H:i:s", time() + 86400);
 
+        $sql = "INSERT INTO usuarios (nombre, email, password, tipo, token_confirmacion, token_expira) 
+                VALUES ('$nombre', '$email', '$password', '$tipo', '$token', '$expira')";
+
+        if ($conn->query($sql) === TRUE) {
+            $mail = new PHPMailer(true);
+
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'speakerzone0@gmail.com';
+                $mail->Password = 'mhmt erxk nioq lszk';
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
+
+                $mail->setFrom('TU_CORREO@gmail.com', 'SpeakerZone');
+                $mail->addAddress($email, $nombre);
+
+                $mail->isHTML(true);
+                $mail->Subject = 'Confirma tu cuenta en SpeakerZone';
+                $mail->Body    = "
+                    <h2>Hola, $nombre</h2>
+                    <p>Gracias por registrarte en SpeakerZone.</p>
+                    <p>Tu token de confirmación es el siguiente. No lo compartas con nadie.</p>
+                    <b>$token</b>
+                    <p>Este enlace expirará en 24 horas.</p>
+                ";
+
+                $mail->send();
+                header("Location: confirmar.php");
+                exit();
+            } catch (Exception $e) {
+                $error = "No se pudo enviar el correo de confirmación. Error: " . $mail->ErrorInfo;
+            }
+        } else {
+            $error = "Error al registrar: " . $conn->error;
+        }
+    }
     $conn->close();
 }
 ?>

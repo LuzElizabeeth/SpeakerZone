@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt2->close();
     $stmt->close();
     $conn->close();
-    header("Location: index.php?msg=Conferencia actualizada correctamente.");
+    header("Location: home.php?msg=Conferencia actualizada correctamente.");
     exit();
 }
 $stmt->close();
@@ -138,11 +138,17 @@ if (!empty($conferencia["fecha"])) {
             <input type="text" name="titulo" value="<?=htmlspecialchars($conferencia["titulo"])?>" required>
             <label>Descripción</label>
             <textarea name="descripcion" required><?=htmlspecialchars($conferencia["descripcion"])?></textarea>
-            <label>Modalidad</label>
-            <select name="modalidad" required>
-                <option value="Virtual" <?=($conferencia["modalidad"]=="Virtual"?"selected":"")?>>Virtual</option>
-                <option value="Presencial" <?=($conferencia["modalidad"]=="Presencial"?"selected":"")?>>Presencial</option>
-            </select>
+            <div class="form-group">
+                    <label for="modalidad">Modalidad:</label>
+                    <select id="modalidad" name="modalidad" required>
+                        <option value="Presencial" <?php 
+                            echo ($mode == 'edit' && $conferencia['modalidad'] == 'Presencial') ? 'selected' : ''; 
+                        ?>>Presencial</option>
+                        <option value="Virtual" <?php 
+                            echo ($mode == 'edit' && $conferencia['modalidad'] == 'Virtual') ? 'selected' : ''; 
+                        ?>>Virtual</option>
+                    </select>
+                </div>
             <label>Fecha y hora</label>
 <div class="row-flex">
     <input type="date" name="fecha" value="<?=htmlspecialchars($fecha_val)?>" required>
@@ -151,7 +157,8 @@ if (!empty($conferencia["fecha"])) {
             <label>Lugar</label>
             <input type="text" name="lugar" value="<?=htmlspecialchars($conferencia["lugar"])?>">
             <div class="btn-group">
-                <button type="submit" class="btn">Guardar cambios</button>
+                
+                <a href="home.php" class="btn guardar">Guardar cambios</a>
                 <a href="home.php" class="btn cancelar">Cancelar</a>
             </div>
         </form>

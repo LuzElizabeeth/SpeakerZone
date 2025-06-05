@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body {margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+        /* ... tu CSS existente ... */
         .navbar {
             width: 100vw;
             height: 68px;
@@ -220,6 +221,66 @@
             .navbar-links a {padding:18px 0;border-top:1px solid #f0fdfa;}
             .navbar-toggle {display:flex;}
         }
+        /* Buscador */
+        .search-box {
+            width: 100%;
+            max-width: 680px;
+            margin: 0 auto 32px auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px #6366f119;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 28px 16px 28px;
+            position: relative;
+            top: 0;
+            z-index: 10;
+        }
+        .search-box label {
+            font-size: 1em;
+            color: #374151;
+            margin-right: 7px;
+            font-weight: 500;
+        }
+        .search-box select,
+        .search-box input[type="date"],
+        .search-box input[type="text"] {
+            padding: 7px 12px;
+            border-radius: 7px;
+            border: 1px solid #d1d5db;
+            font-size: 1em;
+            color: #312e81;
+            background: #f3f4f6;
+            margin-right: 10px;
+        }
+        .search-box button {
+            padding: 8px 21px;
+            border-radius: 7px;
+            border: none;
+            background: linear-gradient(90deg,#6366f1 0%, #06b6d4 100%);
+            color: #fff;
+            font-size: 1.04em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.16s, box-shadow 0.16s;
+            box-shadow: 0 2px 8px #6366f11a;
+        }
+        .search-results {
+            max-width: 730px;
+            margin: 0 auto 28px auto;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 13px;
+            box-shadow: 0 2px 9px #6366f117;
+        }
+        @media (max-width: 750px) {
+            .search-box {flex-direction:column;align-items:stretch;gap:10px;padding:14px 6vw;}
+            .search-box label {margin-right: 0;}
+            .search-box select,.search-box input[type="date"],.search-box input[type="text"] {margin-right: 0;}
+        }
     </style>
 </head>
 <body>
@@ -242,6 +303,156 @@
             </div>
         </div>
     </div>
+
+    <!-- MOTOR DE BÚSQUEDA DE CONFERENCIAS -->
+    <form class="search-box" id="busquedaConferencias" autocomplete="off" style="margin-top:110px; max-width: 800px; background: #f8fafc; box-shadow: 0 6px 24px #6366f11a; padding: 36px 32px 24px 32px; border-radius: 20px; display: flex; flex-direction: column; gap: 30px;">
+    <!-- Campo de búsqueda por nombre o palabra clave -->
+    <div style="width:100%; margin-bottom: 10px;">
+        <label for="busquedaNombre" style="font-size: 1.08em; color: #312e81; font-weight: 700; margin-bottom: 7px; display: block;">Buscar por nombre de conferencia o palabra clave</label>
+        <input type="text" id="busquedaNombre" name="busquedaNombre" placeholder="Ejemplo: Inteligencia Artificial, Web, Liderazgo, etc." style="width:100%; padding: 13px 16px; border-radius: 9px; border: 1.7px solid #c7d2fe; background: #fff; font-size:1.12em; color:#3730a3; margin-bottom: 4px;">
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 28px; justify-content: space-between;">
+        <div style="flex: 1 1 180px; min-width: 180px;">
+            <label for="fecha" style="font-size: 1.03em; color: #312e81; font-weight: 600; margin-bottom: 7px; display: block;">Fecha</label>
+            <input type="date" id="fecha" name="fecha" style="width:100%; padding: 11px 14px; border-radius: 8px; border: 1.5px solid #c7d2fe; background: #fff; font-size:1.07em; color:#3730a3;">
+        </div>
+        <div style="flex: 1 1 180px; min-width: 180px;">
+            <label for="lugar" style="font-size: 1.03em; color: #312e81; font-weight: 600; margin-bottom: 7px; display: block;">Modalidad</label>
+            <input type="text" id="lugar" name="modalidad" placeholder="Presencial o en línea" style="width:100%; padding: 11px 14px; border-radius: 8px; border: 1.5px solid #c7d2fe; background: #fff; font-size:1.07em; color:#3730a3;">
+        </div>
+        <div style="flex: 1 1 180px; min-width: 180px;">
+            <label for="categoria" style="font-size: 1.03em; color: #312e81; font-weight: 600; margin-bottom: 7px; display: block;">Categoría</label>
+            <select id="categoria" name="categoria" style="width:100%; padding: 11px 14px; border-radius: 8px; border: 1.5px solid #c7d2fe; background: #fff; font-size:1.07em; color:#3730a3;">
+                <option value="">Todas</option>
+                <option value="Tecnología">Tecnología</option>
+                <option value="Educación">Educación</option>
+                <option value="Negocios">Negocios</option>
+                <option value="Salud">Salud</option>
+                <option value="Ciencias">Ciencias</option>
+                <option value="Arte">Arte</option>
+            </select>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: flex-end;">
+        <button type="button" onclick="filtrarConferencias()" style="padding: 12px 38px; border-radius: 8px; background: linear-gradient(90deg,#6366f1 0%, #06b6d4 100%); color: #fff; font-weight: bold; font-size: 1.11em; border: none; box-shadow: 0 3px 12px #6366f11a; letter-spacing:.5px;">Buscar</button>
+    </div>
+</form>
+<div class="search-results" id="resultadosBusqueda" style="display:none; margin-bottom: 32px;"></div>
+
+<style>
+.search-results {
+    max-width: 800px !important;
+    margin: 20px auto 28px auto !important;
+    padding: 22px 28px;
+    background: #f3f5fc;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px #6366f117;
+    font-size: 1.08em;
+}
+.search-results div {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e7ff;
+}
+.search-results div:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+@media (max-width: 900px) {
+    .search-box {max-width:98vw !important;}
+    .search-results {max-width:98vw !important;}
+}
+@media (max-width: 600px) {
+    .search-box {padding: 14px 5vw !important;}
+    .search-results {padding: 13px 3vw !important;}
+}
+</style>
+
+<script>
+// Conferencias de ejemplo
+const conferencias = [
+    {
+        titulo: "Inteligencia Artificial en la Educación",
+        fecha: "2025-05-28",
+        hora: "17:00",
+        lugar: "En línea",
+        categoria: "Educación",
+        presentador: "Dra. Ana Robles"
+    },
+    {
+        titulo: "Desarrollo Web Moderno",
+        fecha: "2025-06-01",
+        hora: "11:00",
+        lugar: "Presencial",
+        categoria: "Tecnología",
+        presentador: "Ing. Luis Méndez"
+    },
+    {
+        titulo: "Crecimiento Personal y Liderazgo",
+        fecha: "2025-06-10",
+        hora: "16:00",
+        lugar: "Ciudad de México",
+        categoria: "Negocios",
+        presentador: "Lic. Karla Pérez"
+    },
+    {
+        titulo: "Avances en Biotecnología",
+        fecha: "2025-06-15",
+        hora: "12:30",
+        lugar: "En línea",
+        categoria: "Ciencias",
+        presentador: "Dr. Mario Campos"
+    }
+];
+
+function filtrarConferencias() {
+    const nombre = document.getElementById('busquedaNombre').value.trim().toLowerCase();
+    const fecha = document.getElementById('fecha').value;
+    const lugar = document.getElementById('lugar').value.trim().toLowerCase();
+    const categoria = document.getElementById('categoria').value;
+
+    const resultados = conferencias.filter(conf => {
+        const coincideNombre = !nombre ||
+            conf.titulo.toLowerCase().includes(nombre) ||
+            conf.categoria.toLowerCase().includes(nombre) ||
+            conf.presentador.toLowerCase().includes(nombre) ||
+            conf.lugar.toLowerCase().includes(nombre);
+        const coincideFecha = !fecha || conf.fecha === fecha;
+        const coincideLugar = !lugar || conf.lugar.toLowerCase().includes(lugar);
+        const coincideCategoria = !categoria || conf.categoria === categoria;
+        return coincideNombre && coincideFecha && coincideLugar && coincideCategoria;
+    });
+
+    mostrarResultados(resultados);
+}
+
+function mostrarResultados(lista) {
+    const cont = document.getElementById('resultadosBusqueda');
+    if (lista.length === 0) {
+        cont.innerHTML = '<b>No se encontraron conferencias con los filtros seleccionados.</b>';
+        cont.style.display = 'block';
+        return;
+    }
+    cont.innerHTML = lista.map(conf => `
+        <div>
+            <b>${conf.titulo}</b><br>
+            ${conf.fecha.split('-').reverse().join('/')} · ${conf.hora}<br>
+            Lugar: ${conf.lugar} <br>
+            Categoría: ${conf.categoria} <br>
+            Presentador: ${conf.presentador}
+        </div>
+    `).join('');
+    cont.style.display = 'block';
+}
+
+// Opcional: Ocultar resultados al cambiar filtros
+document.querySelectorAll('#busquedaConferencias input, #busquedaConferencias select').forEach(el => {
+    el.addEventListener('input', () => {
+        document.getElementById('resultadosBusqueda').style.display = 'none';
+    });
+});
+</script>
+
 
     <!-- Hero principal -->
     <section class="hero" data-aos="fade-up">
@@ -354,8 +565,85 @@
     <!-- AOS Animate On Scroll JS -->
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>
+        // Conferencias de ejemplo
+        const conferencias = [
+            {
+                titulo: "Inteligencia Artificial en la Educación",
+                fecha: "2025-05-28",
+                hora: "17:00",
+                lugar: "En línea",
+                categoria: "Educación",
+                presentador: "Dra. Ana Robles"
+            },
+            {
+                titulo: "Desarrollo Web Moderno",
+                fecha: "2025-06-01",
+                hora: "11:00",
+                lugar: "Presencial",
+                categoria: "Tecnología",
+                presentador: "Ing. Luis Méndez"
+            },
+            {
+                titulo: "Crecimiento Personal y Liderazgo",
+                fecha: "2025-06-10",
+                hora: "16:00",
+                lugar: "Ciudad de México",
+                categoria: "Negocios",
+                presentador: "Lic. Karla Pérez"
+            },
+            {
+                titulo: "Avances en Biotecnología",
+                fecha: "2025-06-15",
+                hora: "12:30",
+                lugar: "En línea",
+                categoria: "Ciencias",
+                presentador: "Dr. Mario Campos"
+            }
+        ];
+
+        function filtrarConferencias() {
+            const fecha = document.getElementById('fecha').value;
+            const lugar = document.getElementById('lugar').value.trim().toLowerCase();
+            const categoria = document.getElementById('categoria').value;
+
+            const resultados = conferencias.filter(conf => {
+                const coincideFecha = !fecha || conf.fecha === fecha;
+                const coincideLugar = !lugar || conf.lugar.toLowerCase().includes(lugar);
+                const coincideCategoria = !categoria || conf.categoria === categoria;
+                return coincideFecha && coincideLugar && coincideCategoria;
+            });
+
+            mostrarResultados(resultados);
+        }
+
+        function mostrarResultados(lista) {
+            const cont = document.getElementById('resultadosBusqueda');
+            if (lista.length === 0) {
+                cont.innerHTML = '<b>No se encontraron conferencias con los filtros seleccionados.</b>';
+                cont.style.display = 'block';
+                return;
+            }
+            cont.innerHTML = lista.map(conf => `
+                <div style="padding:13px 0;border-bottom:1px solid #e0e7ff;">
+                    <b>${conf.titulo}</b><br>
+                    ${conf.fecha.split('-').reverse().join('/')} · ${conf.hora}<br>
+                    Lugar: ${conf.lugar} <br>
+                    Categoría: ${conf.categoria} <br>
+                    Presentador: ${conf.presentador}
+                </div>
+            `).join('');
+            cont.style.display = 'block';
+        }
+
+        // Opcional: Ocultar resultados al cambiar filtros
+        document.querySelectorAll('#busquedaConferencias input, #busquedaConferencias select').forEach(el => {
+            el.addEventListener('input', () => {
+                document.getElementById('resultadosBusqueda').style.display = 'none';
+            });
+        });
+
+        // ... script navbar y AOS ...
         AOS.init({duration: 850, once:true});
-        // Navbar scroll hide/show (optional)
         let lastScrollTop = 0, navbar = document.getElementById('navbar');
         window.addEventListener('scroll', function(){
             let st = window.pageYOffset || document.documentElement.scrollTop;
@@ -373,7 +661,6 @@
         navbarToggle.addEventListener('click', function(){
             navbarLinks.classList.toggle('open');
         });
-        // Close on link click (mobile)
         Array.from(document.querySelectorAll('.navbar-links a')).forEach(link => {
             link.addEventListener('click',() => {navbarLinks.classList.remove('open')});
         });

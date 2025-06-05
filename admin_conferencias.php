@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("sssssii", $titulo, $descripcion, $modalidad, $fecha, $lugar, $_POST['conferencia_id'], $presentador_id);
         $stmt->execute();
         
-        header("Location: index.php?msg=Conferencia actualizada correctamente");
+        header("Location: home.php?msg=Conferencia actualizada correctamente");
         exit();
     } else {
         // Crear nueva conferencia
