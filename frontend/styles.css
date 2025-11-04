@@ -1,3 +1,4 @@
+/* 🔄 Reset básico */
 * {
   margin: 0;
   padding: 0;
@@ -11,6 +12,7 @@ body {
   line-height: 1.6;
 }
 
+/* 🔹 Navegación */
 header {
   background-color: #0f3c66;
   padding: 1rem 2rem;
@@ -63,6 +65,7 @@ nav ul li a:hover {
   background-color: #1673cc;
 }
 
+/* 🔹 Hero principal */
 .hero {
   text-align: center;
   padding: 4rem 2rem;
@@ -103,6 +106,7 @@ nav ul li a:hover {
   background-color: #1673cc;
 }
 
+/* 🔹 Contador */
 .countdown {
   text-align: center;
   padding: 2rem;
@@ -129,6 +133,65 @@ nav ul li a:hover {
   text-align: center;
 }
 
+/* 🔹 Formulario de registro */
+.registro {
+  max-width: 500px;
+  margin: 4rem auto;
+  background-color: #0f3c66;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.registro h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #1e90ff;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+label {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+input, select {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #1c3f5f;
+  color: white;
+  font-size: 1rem;
+}
+
+input:focus, select:focus {
+  background-color: #2a5a85;
+  outline: none;
+}
+
+button[type="submit"] {
+  background-color: #1e90ff;
+  color: white;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #1673cc;
+}
+
+/* 🔹 Responsive */
 @media (max-width: 768px) {
   nav ul {
     flex-direction: column;
@@ -145,5 +208,10 @@ nav ul li a:hover {
 
   .timer {
     flex-wrap: wrap;
+  }
+
+  .registro {
+    margin: 2rem 1rem;
+    padding: 2rem;
   }
 }
