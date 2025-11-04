@@ -1,0 +1,154 @@
+/* 🔄 Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0a2a4d;
+  color: white;
+  line-height: 1.6;
+}
+
+/* 🔹 Navegación */
+header {
+  background-color: #0f3c66;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+nav ul li a:hover {
+  color: #1e90ff;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-buttons button {
+  padding: 0.5rem 1rem;
+  background-color: #1e90ff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.nav-buttons button:hover {
+  background-color: #1673cc;
+}
+
+/* 🔹 Sección principal (hero) */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-image: url('../assets/img/fondo-pattern.png'); /* Cambia por tu imagen */
+  background-size: cover;
+  background-position: center;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  font-size: 1.1rem;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.hero-buttons button {
+  padding: 0.75rem 1.5rem;
+  background-color: #1e90ff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.hero-buttons button:hover {
+  background-color: #1673cc;
+}
+
+/* 🔹 Contador de próxima conferencia */
+.countdown {
+  text-align: center;
+  padding: 2rem;
+  background-color: #0f3c66;
+}
+
+.countdown h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.timer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 2rem;
+}
+
+.timer span {
+  background-color: #1e90ff;
+  padding: 1rem;
+  border-radius: 8px;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* 🔹 Responsividad básica */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .timer {
+    flex-wrap: wrap;
+  }
+}
