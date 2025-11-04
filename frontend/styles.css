@@ -1,4 +1,3 @@
-/* 🔄 Reset básico */
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +11,6 @@ body {
   line-height: 1.6;
 }
 
-/* 🔹 Navegación */
 header {
   background-color: #0f3c66;
   padding: 1rem 2rem;
@@ -65,11 +63,10 @@ nav ul li a:hover {
   background-color: #1673cc;
 }
 
-/* 🔹 Sección principal (hero) */
 .hero {
   text-align: center;
   padding: 4rem 2rem;
-  background-image: url('../assets/img/fondo-pattern.png'); /* Cambia por tu imagen */
+  background-image: url('../assets/img/fondo-pattern.png');
   background-size: cover;
   background-position: center;
 }
@@ -106,7 +103,6 @@ nav ul li a:hover {
   background-color: #1673cc;
 }
 
-/* 🔹 Contador de próxima conferencia */
 .countdown {
   text-align: center;
   padding: 2rem;
@@ -133,7 +129,6 @@ nav ul li a:hover {
   text-align: center;
 }
 
-/* 🔹 Responsividad básica */
 @media (max-width: 768px) {
   nav ul {
     flex-direction: column;

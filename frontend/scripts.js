@@ -1,4 +1,3 @@
-// Fecha de la próxima conferencia (formato: Año, Mes (0-11), Día, Hora, Minuto, Segundo)
 const targetDate = new Date(2025, 10, 15, 11, 0, 0); // 15 de noviembre 2025 a las 11:00 AM
 
 function updateCountdown() {
@@ -23,6 +22,5 @@ function updateCountdown() {
   `;
 }
 
-// Actualiza cada segundo
 setInterval(updateCountdown, 1000);
 updateCountdown();
