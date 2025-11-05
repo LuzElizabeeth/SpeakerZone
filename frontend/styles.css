@@ -50,19 +50,23 @@ nav ul li a:hover {
   gap: 1rem;
 }
 
-.nav-buttons button {
-  padding: 0.5rem 1rem;
-  background-color: #1e90ff;
-  border: none;
-  border-radius: 5px;
-  color: white;
+/* 🔹 Botones como enlaces visibles */
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background-color: #ffffff;
+  color: #0a2a4d;
+  border: 2px solid #1e90ff;
+  border-radius: 8px;
   font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
-.nav-buttons button:hover {
-  background-color: #1673cc;
+.btn:hover {
+  background-color: #1e90ff;
+  color: white;
+  border-color: #ffffff;
 }
 
 /* 🔹 Hero principal */
@@ -164,14 +168,15 @@ label {
 input, select {
   padding: 0.75rem;
   border-radius: 8px;
-  border: none;
-  background-color: #1c3f5f;
-  color: white;
+  border: 2px solid #1e90ff;
+  background-color: #e6f0ff;
+  color: #0a2a4d;
   font-size: 1rem;
 }
 
 input:focus, select:focus {
-  background-color: #2a5a85;
+  background-color: #ffffff;
+  border-color: #1673cc;
   outline: none;
 }
 
