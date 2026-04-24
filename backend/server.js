@@ -33,6 +33,10 @@ app.use("/api/conferences", conferenceRoutes(pool));
 app.use("/api/events", eventRoutes(pool));
 app.use("/api/speakers", speakerRoutes(pool));
 
+app.get("/", (_req, res) => {
+  res.send("SpeakerZone backend funcionando ✅");
+});
+
 app.get("/api/db-check", async (_req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
