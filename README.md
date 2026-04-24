@@ -1,10 +1,10 @@
-# 🎤 SpeakerZone TecNM
+#  SpeakerZone TecNM
 
 Sistema web para la gestión de conferencias, ponentes y asistentes dentro del Tecnológico Nacional de México.
 
 ---
 
-## 🚀 Descripción
+##  Descripción
 
 **SpeakerZone** es una plataforma diseñada para administrar eventos académicos, permitiendo:
 
@@ -18,7 +18,7 @@ Este sistema está pensado para facilitar la organización de eventos dentro de 
 
 ---
 
-## 🧠 Tecnologías utilizadas
+##  Tecnologías utilizadas
 
 ### Frontend
 
@@ -41,7 +41,7 @@ Este sistema está pensado para facilitar la organización de eventos dentro de 
 
 ---
 
-## 📁 Estructura del proyecto
+##  Estructura del proyecto
 
 ```
 SpeakerZone/
@@ -57,9 +57,9 @@ SpeakerZone/
 
 ---
 
-## ⚙️ Instalación y ejecución
+##  Instalación y ejecución
 
-### 🔹 Clonar el repositorio
+### - Clonar el repositorio
 
 ```bash
 git clone https://github.com/LuzElizabeeth/SpeakerZone.git
@@ -68,7 +68,7 @@ cd SpeakerZone
 
 ---
 
-### 🔹 Frontend
+### - Frontend
 
 ```bash
 cd frontend
@@ -78,7 +78,7 @@ npm run dev
 
 ---
 
-### 🔹 Backend
+### - Backend
 
 ```bash
 cd backend
@@ -88,7 +88,7 @@ npm run dev
 
 ---
 
-## 🔐 Variables de entorno
+## - Variables de entorno
 
 Crear un archivo `.env` en la carpeta `backend` con:
 
@@ -102,7 +102,7 @@ DB_PORT=5432
 
 ---
 
-## 📌 Funcionalidades principales
+##  Funcionalidades principales
 
 * ✔️ Login de usuarios (Admin / Ponente)
 * ✔️ CRUD de conferencias
@@ -114,13 +114,13 @@ DB_PORT=5432
 
 ---
 
-## 🧪 Estado del proyecto
+##  Estado del proyecto
 
 🚧 En desarrollo
 
 ---
 
-## 👨‍💻 Autor
+##  Autores
 
 * Luz Elizabeth
 * Eduardo Ramirez
@@ -128,6 +128,6 @@ DB_PORT=5432
 
 ---
 
-## 📄 Licencia
+##  Licencia
 
 Este proyecto es de uso académico.
