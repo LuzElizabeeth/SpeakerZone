@@ -20,7 +20,13 @@ const pool = new Pool({
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://speakerzone.netlify.app"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes(pool));
@@ -40,5 +46,5 @@ app.get("/api/db-check", async (_req, res) => {
 
 const PORT = Number(process.env.PORT || 5001);
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
