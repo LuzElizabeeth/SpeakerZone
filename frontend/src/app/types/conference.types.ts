@@ -26,6 +26,7 @@ export interface Conference {
   description: string;
   date: string; // ISO 8601 format
   time: string;
+  endTime?: string | null;
   location: string;
   type: ConferenceType;
   status: ConferenceStatus;
@@ -59,13 +60,34 @@ export interface Attendee {
   conferenceId: string;
 }
 
+export type RegistrationStatus = 'confirmada' | 'pendiente' | 'cancelada';
+
 export interface Registration {
   id: string;
   attendeeId: string;
   conferenceId: string;
   registeredAt: string;
-  status: 'confirmada' | 'pendiente' | 'cancelada';
+  status: RegistrationStatus;
   qrCode: string;
+}
+
+export interface Reservation extends Registration {
+  checkedIn: boolean;
+  checkedInAt: string | null;
+  attendee: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  conference: Conference;
+}
+
+export interface CheckInResponse {
+  ok: boolean;
+  alreadyCheckedIn: boolean;
+  message: string;
+  checkedInAt: string | null;
+  registration: Reservation;
 }
 
 export interface Statistics {
@@ -80,4 +102,3 @@ export interface TrendData {
   date: string;
   count: number;
 }
-

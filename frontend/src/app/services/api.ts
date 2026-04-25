@@ -1,4 +1,13 @@
-import { Conference, Speaker, User, UserRole } from '../types/conference.types';
+/// <reference types="vite/client" />
+
+import {
+  CheckInResponse,
+  Conference,
+  Reservation,
+  Speaker,
+  User,
+  UserRole,
+} from '../types/conference.types';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
@@ -126,5 +135,29 @@ export const api = {
   deleteSpeaker: (id: string) =>
     request<{ ok: boolean }>(`/speakers/${id}`, {
       method: 'DELETE',
+    }),
+
+  reserveConference: (conferenceId: string) =>
+    request<Reservation>('/registrations', {
+      method: 'POST',
+      body: JSON.stringify({ conferenceId }),
+    }),
+
+  getMyReservations: () => request<Reservation[]>('/registrations/me'),
+
+  cancelReservation: (id: string) =>
+    request<{ ok: boolean }>(`/registrations/${id}`, {
+      method: 'DELETE',
+    }),
+
+  getAllRegistrations: () => request<Reservation[]>('/registrations'),
+
+  getConferenceRegistrations: (conferenceId: string) =>
+    request<Reservation[]>(`/registrations/conference/${conferenceId}`),
+
+  checkInByQr: (qrCode: string) =>
+    request<CheckInResponse>('/registrations/check-in', {
+      method: 'POST',
+      body: JSON.stringify({ qrCode }),
     }),
 };

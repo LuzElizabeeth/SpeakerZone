@@ -7,13 +7,13 @@ import authRoutes from "./authRoutes.js";
 import conferenceRoutes from "./routes/conferenceRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import speakerRoutes from "./routes/speakerRoutes.js";
+import registrationRoutes from "./routes/registrationRoutes.js";
 
 dotenv.config();
 
 const { Pool } = pkg;
 
 const useDatabaseUrl = Boolean(process.env.DATABASE_URL);
-const useSsl = process.env.DB_SSL === "true";
 
 const pool = new Pool(
   useDatabaseUrl
@@ -47,6 +47,7 @@ app.use("/api/auth", authRoutes(pool));
 app.use("/api/conferences", conferenceRoutes(pool));
 app.use("/api/events", eventRoutes(pool));
 app.use("/api/speakers", speakerRoutes(pool));
+app.use("/api/registrations", registrationRoutes(pool));
 
 app.get("/", (_req, res) => {
   res.send("SpeakerZone backend funcionando ✅");
