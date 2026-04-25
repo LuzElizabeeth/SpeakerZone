@@ -1,4 +1,4 @@
-# 🎤 Hub académico TecNM
+# 🎤 Hub académico
 
 Sistema web para la gestión de conferencias, ponentes y asistentes dentro del Tecnológico Nacional de México.
 
