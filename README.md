@@ -131,3 +131,31 @@ DB_PORT=5432
 ## 📄 Licencia
 
 Este proyecto es de uso académico.
+
+
+Render connections
+
+Hostname
+An internal hostname used by your Render services.
+dpg-d7ltkq1o3t8c73f5i21g-a
+
+Port
+5432
+
+Database
+speakerzone_tecnm
+
+Username
+speakerzone_tecnm_user
+
+Password
+FGn6gG43N8CP8OQ36FxeFiUcFOa2fclM
+
+Internal Database URL
+postgresql://speakerzone_tecnm_user:FGn6gG43N8CP8OQ36FxeFiUcFOa2fclM@dpg-d7ltkq1o3t8c73f5i21g-a/speakerzone_tecnm
+
+External Database URL
+postgresql://speakerzone_tecnm_user:FGn6gG43N8CP8OQ36FxeFiUcFOa2fclM@dpg-d7ltkq1o3t8c73f5i21g-a.oregon-postgres.render.com/speakerzone_tecnm
+
+PSQL Command
+PGPASSWORD=FGn6gG43N8CP8OQ36FxeFiUcFOa2fclM psql -h dpg-d7ltkq1o3t8c73f5i21g-a.oregon-postgres.render.com -U speakerzone_tecnm_user speakerzone_tecnm
