@@ -45,7 +45,7 @@ export const AttendeeQRCode: React.FC = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Mi Código QR - SpeakerZone',
+          title: 'Mi Código QR - Hub académico',
           text: `Código QR para eventos: ${qrCodeValue}`,
         });
         toast.success('Código compartido exitosamente');

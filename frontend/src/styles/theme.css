@@ -1,7 +1,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* SpeakerZone Brand Colors - Gradiente Azul Vibrante */
+  /* Hub académico Brand Colors - Gradiente Azul Vibrante */
   --deep-blue: #1e3a8a;
   --bright-blue: #3b82f6;
   --blue-gradient-start: #1e40af;
@@ -88,7 +88,7 @@
 }
 
 @theme inline {
-  /* SpeakerZone Custom Colors */
+  /* Hub académico Custom Colors */
   --color-deep-blue: var(--deep-blue);
   --color-bright-blue: var(--bright-blue);
   --color-blue-gradient-start: var(--blue-gradient-start);

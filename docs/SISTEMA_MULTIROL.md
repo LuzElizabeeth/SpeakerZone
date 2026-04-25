@@ -1,8 +1,8 @@
-# Sistema Multi-Rol de SpeakerZone
+# Sistema Multi-Rol de Hub académico
 
 ## 📋 Descripción General
 
-SpeakerZone ahora cuenta con un sistema completo de gestión multi-rol con tres tipos de usuarios principales, cada uno con su propio dashboard, navegación y conjunto de funcionalidades adaptadas a sus necesidades.
+Hub académico ahora cuenta con un sistema completo de gestión multi-rol con tres tipos de usuarios principales, cada uno con su propio dashboard, navegación y conjunto de funcionalidades adaptadas a sus necesidades.
 
 ## 👥 Tipos de Usuarios
 

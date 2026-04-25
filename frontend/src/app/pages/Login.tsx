@@ -204,7 +204,7 @@ export const Login: React.FC = () => {
               <LogIn className="w-7 h-7 text-white" />
             </div>
 
-            <span className="text-2xl text-gray-900">SpeakerZone</span>
+            <span className="text-2xl text-gray-900">Hub académico</span>
           </Link>
 
           <h1 className="text-3xl mb-2 text-gray-900">
@@ -403,7 +403,7 @@ export const Login: React.FC = () => {
 
         <div className="relative z-10 max-w-md text-white">
           <h2 className="text-4xl mb-6">
-            Gestiona tu experiencia en SpeakerZone
+            Gestiona tu experiencia en Hub académico
           </h2>
 
           <p className="text-xl text-white/90 mb-8">

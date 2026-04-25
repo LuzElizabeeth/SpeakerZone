@@ -31,7 +31,7 @@ export const Speakers: React.FC = () => {
             <div className="w-10 h-10 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end rounded-lg flex items-center justify-center">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl text-gray-900">SpeakerZone</span>
+            <span className="text-xl text-gray-900">Hub académico</span>
           </Link>
 
           <Link to="/login" className="px-4 py-2 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white rounded-lg">

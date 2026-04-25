@@ -1,6 +1,6 @@
 INSERT INTO usuarios (id, nombre, email, password, rol)
 VALUES
-('30000000-0000-0000-0000-000000000001','Administrador SpeakerZone','admin@speakerzone.com', crypt('123456', gen_salt('bf')), 'administrativo'),
+('30000000-0000-0000-0000-000000000001','Administrador Hub académico','admin@speakerzone.com', crypt('123456', gen_salt('bf')), 'administrativo'),
 ('30000000-0000-0000-0000-000000000002','Conferencista Demo','speaker@speakerzone.com', crypt('123456', gen_salt('bf')), 'conferencista'),
 ('30000000-0000-0000-0000-000000000003','Asistente Demo','asistente@speakerzone.com', crypt('123456', gen_salt('bf')), 'asistente');
 

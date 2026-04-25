@@ -97,7 +97,7 @@ export const Dashboard: React.FC = () => {
                 </div>
 
                 <span className="text-xl text-gray-900">
-                  SpeakerZone
+                  Hub académico
                 </span>
               </Link>
 

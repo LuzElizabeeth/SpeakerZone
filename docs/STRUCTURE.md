@@ -1,4 +1,4 @@
-# 📋 SpeakerZone - Estructura del Proyecto
+# 📋 Hub académico - Estructura del Proyecto
 
 ## 📁 Organización de Carpetas
 
@@ -39,7 +39,7 @@
 ## 🎨 Paleta de Colores (theme.css)
 
 ```css
-/* Gradiente Azul Vibrante de SpeakerZone */
+/* Gradiente Azul Vibrante de Hub académico */
 --deep-blue: #1e3a8a;
 --bright-blue: #3b82f6;
 --blue-gradient-start: #1e40af;

@@ -1,7 +1,7 @@
 import { Attendee, Speaker } from '../types/conference.types';
 
 /**
- * Mock Data extendido para SpeakerZone
+ * Mock Data extendido para Hub académico
  */
 
 // Eventos principales (conjunto de conferencias)

@@ -1,6 +1,6 @@
-# 🎭 Guía de Roles - SpeakerZone
+# 🎭 Guía de Roles - Hub académico
 
-Esta guía te ayudará a probar las diferentes vistas y funcionalidades según el rol de usuario en SpeakerZone.
+Esta guía te ayudará a probar las diferentes vistas y funcionalidades según el rol de usuario en Hub académico.
 
 ## 🚀 Cómo Probar los Diferentes Roles
 
@@ -314,6 +314,6 @@ Si encuentras algún problema o tienes sugerencias:
 
 <div align="center">
 
-**¡Disfruta explorando SpeakerZone!** 🎉
+**¡Disfruta explorando Hub académico!** 🎉
 
 </div>
