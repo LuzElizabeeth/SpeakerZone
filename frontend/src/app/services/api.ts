@@ -22,7 +22,6 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   (isLocal ? "http://localhost:5001/api" : "/api");
 
-// 🔐 AUTH TOKEN
 export const AUTH_TOKEN_KEY = 'speakerzone_token';
 
 export const getAuthToken = () =>
@@ -37,9 +36,6 @@ export interface SpeakerPayload {
   avatarUrl?: string;
 }
 
-/**
- * LEGACY
- */
 export interface ConferencePayload {
   eventId?: string;
   speakerId?: string;
@@ -56,9 +52,6 @@ export interface ConferencePayload {
   status?: string;
 }
 
-/**
- * LEGACY
- */
 export interface EventFromApi {
   id: string;
   name: string;
@@ -125,21 +118,11 @@ export const api = {
       body: JSON.stringify({ name, email, password, role }),
     }),
 
-  /*
-  |--------------------------------------------------------------------------
-  | PROGRAMS
-  |--------------------------------------------------------------------------
-  */
+  // PROGRAMS
   getPrograms: () => request<Program[]>('/programs'),
+  getProgramById: (id: string) => request<Program>(`/programs/${id}`),
 
-  getProgramById: (id: string) =>
-    request<Program>(`/programs/${id}`),
-
-  /*
-  |--------------------------------------------------------------------------
-  | ACTIVITIES
-  |--------------------------------------------------------------------------
-  */
+  // ACTIVITIES
   getActivitiesByProgram: (programId: string) =>
     request<Activity[]>(`/programs/${programId}/activities`),
 
@@ -155,11 +138,7 @@ export const api = {
       body: JSON.stringify({ activityId }),
     }),
 
-  /*
-  |--------------------------------------------------------------------------
-  | SPEAKERS
-  |--------------------------------------------------------------------------
-  */
+  // SPEAKERS
   getSpeakers: () =>
     request<(Speaker & { totalConferences: number })[]>('/speakers'),
 
@@ -180,11 +159,7 @@ export const api = {
       method: 'DELETE',
     }),
 
-  /*
-  |--------------------------------------------------------------------------
-  | REGISTRATIONS
-  |--------------------------------------------------------------------------
-  */
+  // REGISTRATIONS
   getMyReservations: () =>
     request<Reservation[]>('/registrations/me'),
 
@@ -196,60 +171,13 @@ export const api = {
   getAllRegistrations: () =>
     request<Reservation[]>('/registrations'),
 
-  getConferenceRegistrations: (conferenceId: string) =>
-    request<Reservation[]>(`/registrations/conference/${conferenceId}`),
-
   checkInByQr: (qrCode: string) =>
     request<CheckInResponse>('/registrations/check-in', {
       method: 'POST',
       body: JSON.stringify({ qrCode }),
     }),
 
-  /*
-  |--------------------------------------------------------------------------
-  | LEGACY (compatibilidad)
-  |--------------------------------------------------------------------------
-  */
-  getEvents: () =>
-    request<EventFromApi[]>('/events'),
-
-  getEventById: (id: string) =>
-    request<EventFromApi>(`/events/${id}`),
-
-  getConferences: () =>
-    request<Conference[]>('/conferences'),
-
-  getConferenceById: (id: string) =>
-    request<Conference>(`/conferences/${id}`),
-
-  createConference: (payload: ConferencePayload) =>
-    request<Conference>('/conferences', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
-
-  updateConference: (id: string, payload: Partial<ConferencePayload>) =>
-    request<Conference>(`/conferences/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(payload),
-    }),
-
-  deleteConference: (id: string) =>
-    request<{ ok: boolean }>(`/conferences/${id}`, {
-      method: 'DELETE',
-    }),
-
-  reserveConference: (conferenceId: string) =>
-    request<Reservation>('/registrations', {
-      method: 'POST',
-      body: JSON.stringify({ conferenceId }),
-    }),
-
-  /*
-  |--------------------------------------------------------------------------
-  | USERS
-  |--------------------------------------------------------------------------
-  */
+  // USERS
   getUsers: () => request<SystemUser[]>('/users'),
 
   createUser: (payload: CreateSystemUserPayload) =>
