@@ -15,15 +15,14 @@ dotenv.config();
 
 const { Pool } = pkg;
 
+// ✅ Detecta si existe DATABASE_URL
 const useDatabaseUrl = Boolean(process.env.DATABASE_URL);
 
 const pool = new Pool(
   useDatabaseUrl
     ? {
         connectionString: process.env.DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: { rejectUnauthorized: false }, // Render requiere SSL
       }
     : {
         user: process.env.DB_USER || "postgres",
@@ -34,7 +33,8 @@ const pool = new Pool(
       }
 );
 
-if (!process.env.DB_PASSWORD) {
+// ✅ Solo valida DB_PASSWORD si no usas DATABASE_URL
+if (!useDatabaseUrl && !process.env.DB_PASSWORD) {
   throw new Error("DB_PASSWORD no está definido");
 }
 
@@ -49,6 +49,7 @@ app.use(
 
 app.use(express.json());
 
+// ✅ Rutas
 app.use("/api/auth", authRoutes(pool));
 app.use("/api/activities", activityRoutes(pool));
 app.use("/api/events", eventRoutes(pool));
@@ -64,17 +65,13 @@ app.get("/", (_req, res) => {
 app.get("/api/db-check", async (_req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
-
     res.json({
       status: "Conectado a PostgreSQL 🚀",
       time: result.rows[0].now,
     });
   } catch (error) {
     console.error("Error al conectar con PostgreSQL:", error);
-
-    res.status(500).json({
-      error: "Error al conectar con la base de datos",
-    });
+    res.status(500).json({ error: "Error al conectar con la base de datos" });
   }
 });
 
