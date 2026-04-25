@@ -1,19 +1,24 @@
 import React, { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Search, Filter, Zap, ArrowLeft } from 'lucide-react';
+import { Search, Filter, Zap, ArrowLeft, AlertCircle } from 'lucide-react';
 import { ConferenceCard } from '../components/ConferenceCard';
 import { SuccessModal } from '../components/SuccessModal';
 import { ConferenceType } from '../types/conference.types';
 import { api } from '../services/api';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../context/AuthContext';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<ConferenceType | 'todas'>('todas');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [registeredConferenceTitle, setRegisteredConferenceTitle] = useState('');
+  const [registeredQrCode, setRegisteredQrCode] = useState('');
+  const [reservationError, setReservationError] = useState<string | null>(null);
+  const [registeringConferenceId, setRegisteringConferenceId] = useState<string | null>(null);
 
   const loadConferences = useCallback(() => api.getConferences(), []);
 
@@ -21,6 +26,7 @@ export const Dashboard: React.FC = () => {
     data: conferences,
     loading,
     error,
+    refetch,
   } = useApi(loadConferences, []);
 
   const filteredConferences = conferences.filter((conf) => {
@@ -34,12 +40,44 @@ export const Dashboard: React.FC = () => {
     return matchesSearch && matchesType;
   });
 
-  const handleRegister = (conferenceId: string) => {
+  const handleRegister = async (conferenceId: string) => {
+    setReservationError(null);
+
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (user?.role !== 'attendee') {
+      setReservationError('Solo los usuarios con perfil de asistente pueden reservar conferencias.');
+      return;
+    }
+
     const conference = conferences.find((item) => item.id === conferenceId);
 
-    if (conference) {
-      setRegisteredConferenceTitle(conference.title);
+    if (!conference) {
+      setReservationError('No se encontró la conferencia seleccionada.');
+      return;
+    }
+
+    try {
+      setRegisteringConferenceId(conferenceId);
+
+      const reservation = await api.reserveConference(conferenceId);
+
+      setRegisteredConferenceTitle(reservation.conference.title);
+      setRegisteredQrCode(reservation.qrCode);
       setShowSuccessModal(true);
+
+      await refetch();
+    } catch (err) {
+      setReservationError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo completar la reservación.'
+      );
+    } finally {
+      setRegisteringConferenceId(null);
     }
   };
 
@@ -81,7 +119,7 @@ export const Dashboard: React.FC = () => {
               </Link>
 
               <Link
-                to="/login"
+                to={isAuthenticated ? `/${user?.role}/dashboard` : '/login'}
                 className="px-4 py-2 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white rounded-lg hover:shadow-lg transition-all"
               >
                 Mi Perfil
@@ -124,6 +162,7 @@ export const Dashboard: React.FC = () => {
               </label>
 
               <select
+                id="conference-type-filter"
                 aria-label="Filtrar conferencias por modalidad"
                 title="Filtrar conferencias por modalidad"
                 value={selectedType}
@@ -149,6 +188,22 @@ export const Dashboard: React.FC = () => {
             </p>
           </div>
         </div>
+
+        {reservationError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 mt-0.5" />
+            <div>
+              <h2 className="text-lg mb-1">No se pudo reservar</h2>
+              <p>{reservationError}</p>
+            </div>
+          </div>
+        )}
+
+        {registeringConferenceId && (
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-xl p-4 mb-6">
+            Procesando reservación...
+          </div>
+        )}
 
         {loading && (
           <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-600">
@@ -198,8 +253,8 @@ export const Dashboard: React.FC = () => {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        title="Módulo de reservas pendiente"
-        message={`La conferencia "${registeredConferenceTitle}" todavía no se puede reservar de forma real. En la siguiente fase conectaremos este botón con PostgreSQL mediante registrations.`}
+        title="¡Reservación confirmada!"
+        message={`Tu plaza para "${registeredConferenceTitle}" fue reservada correctamente. Código QR: ${registeredQrCode}`}
       />
     </div>
   );

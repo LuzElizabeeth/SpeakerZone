@@ -1,316 +1,401 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Users, Shield } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Lock,
+  LogIn,
+  Mail,
+  User,
+  UserPlus,
+  CalendarCheck,
+  QrCode,
+  ShieldCheck,
+} from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types/conference.types';
+
+interface LoginLocationState {
+  from?: string;
+}
+
+const getHomePathByRole = (role?: UserRole) => {
+  switch (role) {
+    case 'admin':
+      return '/admin/dashboard';
+    case 'speaker':
+      return '/speaker/dashboard';
+    case 'attendee':
+      return '/attendee/dashboard';
+    default:
+      return '/';
+  }
+};
+
+const canAccessPathByRole = (role: UserRole, path?: string) => {
+  if (!path) return false;
+
+  if (path.startsWith('/admin')) return role === 'admin';
+  if (path.startsWith('/speaker')) return role === 'speaker';
+  if (path.startsWith('/attendee')) return role === 'attendee';
+
+  return true;
+};
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const location = useLocation();
+
+  const { login, register, user, isAuthenticated, isInitializing } = useAuth();
+
+  const state = location.state as LoginLocationState | null;
+  const fromPath = state?.from;
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberSession, setRememberSession] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>('attendee');
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (!isInitializing && isAuthenticated && user) {
+      const targetPath = canAccessPathByRole(user.role, fromPath)
+        ? fromPath
+        : getHomePathByRole(user.role);
+
+      navigate(targetPath || getHomePathByRole(user.role), { replace: true });
+    }
+  }, [fromPath, isAuthenticated, isInitializing, navigate, user]);
+
+  const redirectAfterAuth = (role: UserRole) => {
+    const targetPath = canAccessPathByRole(role, fromPath)
+      ? fromPath
+      : getHomePathByRole(role);
+
+    navigate(targetPath || getHomePathByRole(role), { replace: true });
+  };
+
+  const resetFormState = (nextIsLogin: boolean) => {
+    setIsLogin(nextIsLogin);
+    setShowPassword(false);
+    setRememberSession(true);
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+    });
+  };
+
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      name: value,
+    }));
+  };
+
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      email: value,
+    }));
+  };
+
+  const handlePasswordChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      password: value,
+    }));
+  };
+
+  const validateForm = () => {
+    const email = formData.email.trim();
+    const password = formData.password;
+
+    if (!email || !password) {
+      toast.error('Correo y contraseña son obligatorios.');
+      return false;
+    }
+
+    if (!isLogin && formData.name.trim().length < 3) {
+      toast.error('El nombre debe tener al menos 3 caracteres.');
+      return false;
+    }
+
+    if (!isLogin && password.length < 6) {
+      toast.error('La contraseña debe tener al menos 6 caracteres.');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!validateForm()) return;
+
     setIsLoading(true);
 
     try {
       if (isLogin) {
-        const authenticatedUser = await login(formData.email, formData.password);
-
-        toast.success('¡Bienvenido de vuelta!');
-
-        switch (authenticatedUser.role) {
-          case 'admin':
-            navigate('/admin/dashboard');
-            break;
-
-          case 'speaker':
-            navigate('/speaker/dashboard');
-            break;
-
-          case 'attendee':
-          default:
-            navigate('/attendee/dashboard');
-            break;
-        }
-      } else {
-        const registeredUser = await register(
-          formData.name,
-          formData.email,
+        const authenticatedUser = await login(
+          formData.email.trim().toLowerCase(),
           formData.password,
-          'attendee'
+          rememberSession
         );
 
-        toast.success('¡Cuenta creada exitosamente!');
+        toast.success(`Bienvenido, ${authenticatedUser.name}.`);
+        redirectAfterAuth(authenticatedUser.role);
+      } else {
+        const registeredUser = await register(
+          formData.name.trim(),
+          formData.email.trim().toLowerCase(),
+          formData.password,
+          'attendee',
+          rememberSession
+        );
 
-        switch (registeredUser.role) {
-          case 'admin':
-            navigate('/admin/dashboard');
-            break;
-
-          case 'speaker':
-            navigate('/speaker/dashboard');
-            break;
-
-          case 'attendee':
-          default:
-            navigate('/attendee/dashboard');
-            break;
-        }
+        toast.success('Cuenta creada correctamente.');
+        redirectAfterAuth(registeredUser.role);
       }
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Error al procesar la solicitud. Intenta de nuevo.'
+          : 'No se pudo completar la solicitud.'
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted">
+        <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+          <div className="w-10 h-10 border-4 border-blue-light border-t-blue-accent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Validando sesión...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2 mb-8">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end rounded-lg flex items-center justify-center">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+              <LogIn className="w-7 h-7 text-white" />
             </div>
+
             <span className="text-2xl text-gray-900">SpeakerZone</span>
           </Link>
 
-          {/* Title */}
           <h1 className="text-3xl mb-2 text-gray-900">
-            {isLogin ? 'Bienvenido de vuelta' : 'Crear una cuenta'}
+            {isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
           </h1>
-          <p className="text-gray-600 mb-8">
-            {isLogin 
-              ? 'Ingresa tus credenciales para continuar' 
-              : 'Regístrate para comenzar a explorar conferencias'}
+
+          <p className="text-gray-600 mb-6">
+            {isLogin
+              ? 'Accede con tu correo y contraseña para continuar.'
+              : 'Crea una cuenta para reservar conferencias y consultar tus accesos.'}
           </p>
 
-          {/* Role Selection (only for login) */}
-          {isLogin && (
-            <div className="mb-6">
-              <label className="block text-sm text-gray-700 mb-3">
-                Selecciona tu rol
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole('attendee')}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                    selectedRole === 'attendee'
-                      ? 'border-blue-accent bg-blue-light'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <User className={`w-6 h-6 ${selectedRole === 'attendee' ? 'text-blue-accent' : 'text-gray-400'}`} />
-                  <span className={`text-sm ${selectedRole === 'attendee' ? 'text-blue-accent' : 'text-gray-600'}`}>
-                    Asistente
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole('speaker')}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                    selectedRole === 'speaker'
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Users className={`w-6 h-6 ${selectedRole === 'speaker' ? 'text-purple-600' : 'text-gray-400'}`} />
-                  <span className={`text-sm ${selectedRole === 'speaker' ? 'text-purple-600' : 'text-gray-600'}`}>
-                    Speaker
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole('admin')}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                    selectedRole === 'admin'
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Shield className={`w-6 h-6 ${selectedRole === 'admin' ? 'text-orange-600' : 'text-gray-400'}`} />
-                  <span className={`text-sm ${selectedRole === 'admin' ? 'text-orange-600' : 'text-gray-600'}`}>
-                    Admin
-                  </span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
               <div>
-                <label htmlFor="name" className="block text-sm text-gray-700 mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm text-gray-700 mb-2"
+                >
                   Nombre completo
                 </label>
+
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+
                   <input
                     id="name"
+                    name="name"
                     type="text"
                     required={!isLogin}
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={handleNameChange}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all"
-                    placeholder="Juan Pérez"
+                    placeholder="Tu nombre completo"
+                    autoComplete="name"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm text-gray-700 mb-2"
+              >
                 Correo electrónico
               </label>
+
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+
                 <input
                   id="email"
+                  name="email"
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={handleEmailChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all"
                   placeholder="tu@email.com"
+                  autoComplete="username"
                 />
               </div>
-              {isLogin && (
-                <p className="text-xs text-gray-500 mt-2">
-                  Usa "admin@..." para Admin, "speaker@..." para Speaker
-                </p>
-              )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm text-gray-700 mb-2"
+              >
                 Contraseña
               </label>
+
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+
                 <input
-                  type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="••••••••"
+                  type={showPassword ? 'text' : 'password'}
                   required
+                  value={formData.password}
+                  onChange={handlePasswordChange}
+                  placeholder="••••••••"
                   className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all"
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
                 />
+
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }
+                  title={
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
 
-            {/* Recordar / Olvidé contraseña */}
-            {isLogin && (
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 text-blue-accent border-gray-300 rounded focus:ring-blue-accent"
-                  />
-                  <span className="text-sm text-gray-600">Recordarme</span>
-                </label>
-                <button
-                  type="button"
-                  className="text-sm text-blue-accent hover:text-blue-hover transition-colors"
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
-              </div>
-            )}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={rememberSession}
+                  onChange={(event) =>
+                    setRememberSession(event.target.checked)
+                  }
+                  className="w-4 h-4 text-blue-accent border-gray-300 rounded focus:ring-blue-accent"
+                />
 
-            {/* Botón Submit */}
+                <span className="text-sm text-gray-600">
+                  Mantener sesión en este navegador
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white rounded-lg hover:shadow-lg transition-all hover:scale-[1.02]"
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white rounded-lg hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
-              <ArrowRight className="w-5 h-5" />
+              {isLoading
+                ? isLogin
+                  ? 'Iniciando sesión...'
+                  : 'Creando cuenta...'
+                : isLogin
+                  ? 'Iniciar sesión'
+                  : 'Crear cuenta'}
+
+              {!isLoading && <ArrowRight className="w-5 h-5" />}
             </button>
           </form>
 
-          {/* Divisor */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200" />
             </div>
+
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">O continúa con</span>
+              <span className="px-4 bg-white text-gray-500">
+                Acceso mediante cuenta registrada
+              </span>
             </div>
           </div>
 
-          {/* Social Login */}
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 py-3 px-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              title="Inicio con Google no disponible en esta versión"
+              className="flex items-center justify-center gap-2 py-3 px-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
+            >
               Google
             </button>
-            <button className="flex items-center justify-center gap-2 py-3 px-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
+
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              title="Inicio con GitHub no disponible en esta versión"
+              className="flex items-center justify-center gap-2 py-3 px-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
+            >
               GitHub
             </button>
           </div>
 
-          {/* Toggle Login/Registro */}
           <p className="text-center text-sm text-gray-600 mt-8">
             {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}{' '}
+
             <button
               type="button"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => resetFormState(!isLogin)}
               className="text-blue-accent hover:text-blue-hover transition-colors"
             >
-              {isLogin ? 'Regístrate gratis' : 'Inicia sesión'}
+              {isLogin ? 'Crear cuenta' : 'Iniciar sesión'}
             </button>
           </p>
         </div>
       </div>
 
-      {/* Imagen Inspiracional - Lado Derecho */}
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-gradient-start to-blue-gradient-end p-12 items-center justify-center relative overflow-hidden">
-        {/* Pattern decorativo */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl" />
@@ -318,30 +403,58 @@ export const Login: React.FC = () => {
 
         <div className="relative z-10 max-w-md text-white">
           <h2 className="text-4xl mb-6">
-            Únete a la comunidad de innovadores
+            Gestiona tu experiencia en SpeakerZone
           </h2>
+
           <p className="text-xl text-white/90 mb-8">
-            Conecta con expertos, aprende de los mejores y lleva tu carrera al siguiente nivel.
+            Accede a conferencias, consulta tus reservaciones y conserva tus
+            códigos de acceso en un solo lugar.
           </p>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <p className="text-3xl mb-2">500+</p>
-              <p className="text-white/80">Conferencias</p>
+          <div className="space-y-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-5 flex items-start gap-4">
+              <CalendarCheck className="w-6 h-6 mt-1" />
+
+              <div>
+                <h3 className="text-lg">Reserva conferencias</h3>
+                <p className="text-white/80 text-sm">
+                  Explora las sesiones disponibles y aparta tu lugar de forma
+                  sencilla.
+                </p>
+              </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <p className="text-3xl mb-2">50K+</p>
-              <p className="text-white/80">Miembros</p>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-5 flex items-start gap-4">
+              <QrCode className="w-6 h-6 mt-1" />
+
+              <div>
+                <h3 className="text-lg">Consulta tu acceso</h3>
+                <p className="text-white/80 text-sm">
+                  Visualiza el código de acceso asociado a tus reservaciones.
+                </p>
+              </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <p className="text-3xl mb-2">200+</p>
-              <p className="text-white/80">Expertos</p>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-5 flex items-start gap-4">
+              <ShieldCheck className="w-6 h-6 mt-1" />
+
+              <div>
+                <h3 className="text-lg">Sesión segura</h3>
+                <p className="text-white/80 text-sm">
+                  Tu cuenta se valida mediante credenciales registradas en el
+                  sistema.
+                </p>
+              </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <p className="text-3xl mb-2">95%</p>
-              <p className="text-white/80">Satisfacción</p>
-            </div>
+          </div>
+
+          <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-5">
+            <h3 className="text-lg mb-2">Acceso administrativo</h3>
+
+            <p className="text-white/80 text-sm">
+              Las cuentas internas del sistema son administradas directamente
+              desde el panel autorizado.
+            </p>
           </div>
         </div>
       </div>

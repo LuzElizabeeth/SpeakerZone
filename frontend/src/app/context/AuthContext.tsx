@@ -1,28 +1,104 @@
 import React, {
   createContext,
-  useContext,
-  useState,
   ReactNode,
+  useCallback,
+  useContext,
   useEffect,
+  useState,
 } from 'react';
 import { User, UserRole } from '../types/conference.types';
-import { api } from '../services/api';
+import { api, AUTH_TOKEN_KEY } from '../services/api';
+
+const AUTH_USER_KEY = 'speakerzone_user';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<User>;
+  login: (
+    email: string,
+    password: string,
+    rememberSession?: boolean
+  ) => Promise<User>;
   register: (
     name: string,
     email: string,
     password: string,
-    role?: UserRole
+    role?: UserRole,
+    rememberSession?: boolean
   ) => Promise<User>;
   logout: () => void;
+  refreshSession: () => Promise<User | null>;
   isAuthenticated: boolean;
-  isAuthLoading: boolean;
+  isInitializing: boolean;
+}
+
+type AuthStorageType = 'local' | 'session';
+
+interface StoredSession {
+  user: User;
+  token: string;
+  storageType: AuthStorageType;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const safeParseUser = (value: string | null): User | null => {
+  if (!value) return null;
+
+  try {
+    return JSON.parse(value) as User;
+  } catch {
+    return null;
+  }
+};
+
+const getStoredSession = (): StoredSession | null => {
+  const localToken = localStorage.getItem(AUTH_TOKEN_KEY);
+  const localUser = safeParseUser(localStorage.getItem(AUTH_USER_KEY));
+
+  if (localToken && localUser) {
+    return {
+      token: localToken,
+      user: localUser,
+      storageType: 'local',
+    };
+  }
+
+  const sessionToken = sessionStorage.getItem(AUTH_TOKEN_KEY);
+  const sessionUser = safeParseUser(sessionStorage.getItem(AUTH_USER_KEY));
+
+  if (sessionToken && sessionUser) {
+    return {
+      token: sessionToken,
+      user: sessionUser,
+      storageType: 'session',
+    };
+  }
+
+  return null;
+};
+
+const clearStoredSession = () => {
+  localStorage.removeItem(AUTH_USER_KEY);
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+
+  sessionStorage.removeItem(AUTH_USER_KEY);
+  sessionStorage.removeItem(AUTH_TOKEN_KEY);
+};
+
+const saveStoredSession = (
+  nextUser: User,
+  token: string,
+  rememberSession: boolean
+) => {
+  const targetStorage = rememberSession ? localStorage : sessionStorage;
+  const secondaryStorage = rememberSession ? sessionStorage : localStorage;
+
+  secondaryStorage.removeItem(AUTH_USER_KEY);
+  secondaryStorage.removeItem(AUTH_TOKEN_KEY);
+
+  targetStorage.setItem(AUTH_USER_KEY, JSON.stringify(nextUser));
+  targetStorage.setItem(AUTH_TOKEN_KEY, token);
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -37,74 +113,98 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const initialSession = getStoredSession();
+
+  const [user, setUser] = useState<User | null>(initialSession?.user || null);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  const saveSession = useCallback(
+    (nextUser: User, token: string, rememberSession = true) => {
+      setUser(nextUser);
+      saveStoredSession(nextUser, token, rememberSession);
+    },
+    []
+  );
+
+  const logout = useCallback(() => {
+    setUser(null);
+    clearStoredSession();
+  }, []);
+
+  const refreshSession = useCallback(async (): Promise<User | null> => {
+    const storedSession = getStoredSession();
+
+    if (!storedSession) {
+      logout();
+      return null;
+    }
+
+    try {
+      const currentUser = await api.getCurrentUser();
+
+      saveSession(
+        currentUser,
+        storedSession.token,
+        storedSession.storageType === 'local'
+      );
+
+      return currentUser;
+    } catch {
+      logout();
+      return null;
+    }
+  }, [logout, saveSession]);
 
   useEffect(() => {
-    const initializeAuth = () => {
-      try {
-        const savedUser = localStorage.getItem('speakerzone_user');
-        const savedToken = localStorage.getItem('speakerzone_token');
+    let isMounted = true;
 
-        if (savedUser && savedToken) {
-          setUser(JSON.parse(savedUser));
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Error al restaurar sesión:', error);
+    const validateStoredSession = async () => {
+      await refreshSession();
 
-        localStorage.removeItem('speakerzone_user');
-        localStorage.removeItem('speakerzone_token');
-        setUser(null);
-      } finally {
-        setIsAuthLoading(false);
+      if (isMounted) {
+        setIsInitializing(false);
       }
     };
 
-    initializeAuth();
-  }, []);
+    validateStoredSession();
 
-  const saveSession = (nextUser: User, token: string) => {
-    setUser(nextUser);
-    localStorage.setItem(
-      'speakerzone_user',
-      JSON.stringify(nextUser)
-    );
-    localStorage.setItem('speakerzone_token', token);
-  };
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshSession]);
 
   const login = async (
     email: string,
-    password: string
+    password: string,
+    rememberSession = true
   ): Promise<User> => {
-    const response = await api.login(email, password);
-    saveSession(response.user, response.token);
+    const response = await api.login(email.trim().toLowerCase(), password);
+    saveSession(response.user, response.token, rememberSession);
     return response.user;
   };
 
   const register = async (
-    name: string,
-    email: string,
-    password: string,
-    role: UserRole = 'attendee'
-  ): Promise<User> => {
-    const response = await api.register(
-      name,
-      email,
-      password,
-      role
-    );
+  name: string,
+  email: string,
+  password: string,
+  role: UserRole = 'attendee',
+  rememberSession = true
+): Promise<User> => {
+  const response = await api.register(
+    name.trim(),
+    email.trim().toLowerCase(),
+    password,
+    role
+  );
 
-    saveSession(response.user, response.token);
-    return response.user;
-  };
+  saveSession(
+    response.user,
+    response.token,
+    rememberSession
+  );
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('speakerzone_user');
-    localStorage.removeItem('speakerzone_token');
-  };
+  return response.user;
+};
 
   return (
     <AuthContext.Provider
@@ -113,8 +213,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         login,
         register,
         logout,
-        isAuthenticated: !!user,
-        isAuthLoading,
+        refreshSession,
+        isAuthenticated: user !== null,
+        isInitializing,
       }}
     >
       {children}

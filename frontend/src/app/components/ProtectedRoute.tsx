@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
 }
 
-const getHomePathByRole = (role?: UserRole) => {
+export const getHomePathByRole = (role?: UserRole) => {
   switch (role) {
     case 'admin':
       return '/admin/dashboard';
@@ -28,41 +28,27 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   allowedRoles,
 }) => {
-  const {
-    user,
-    isAuthenticated,
-    isAuthLoading,
-  } = useAuth();
-
+  const { user, isAuthenticated, isInitializing } = useAuth();
   const location = useLocation();
 
-  /**
-   * Paso 1:
-   * Esperar a que AuthContext termine de restaurar sesión
-   */
-  if (isAuthLoading) {
+  if (isInitializing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted">
-        <div className="text-center">
-          <p className="text-gray-600">
-            Verificando sesión...
-          </p>
+        <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+          <div className="w-10 h-10 border-4 border-blue-light border-t-blue-accent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Validando sesión...</p>
         </div>
       </div>
     );
   }
 
-  /**
-   * Paso 2:
-   * Si ya terminó y no hay sesión → login
-   */
   if (!isAuthenticated) {
     return (
       <Navigate
         to="/login"
         replace
         state={{
-          from: location.pathname,
+          from: `${location.pathname}${location.search}`,
         }}
       />
     );

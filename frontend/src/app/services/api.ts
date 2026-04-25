@@ -3,16 +3,25 @@
 import {
   CheckInResponse,
   Conference,
+  CreateSystemUserPayload,
   Reservation,
+  ResetPasswordResponse,
   Speaker,
+  SystemUser,
+  UpdateSystemUserPayload,
   User,
   UserRole,
   Activity,
   Program,
 } from '../types/conference.types';
 
-const API_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
+export const AUTH_TOKEN_KEY = 'speakerzone_token';
+
+export const getAuthToken = () =>
+  localStorage.getItem(AUTH_TOKEN_KEY) ||
+  sessionStorage.getItem(AUTH_TOKEN_KEY);
 
 export interface SpeakerPayload {
   name: string;
@@ -66,11 +75,8 @@ interface AuthResponse {
   user: User;
 }
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const token = localStorage.getItem('speakerzone_token');
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const token = getAuthToken();
 
   const response = await fetch(`${API_URL}${path}`, {
     headers: {
@@ -93,15 +99,15 @@ async function request<T>(
     );
   }
 
+  if (response.status === 204) {
+    return null as T;
+  }
+
   return response.json();
 }
 
 export const api = {
-  /*
-  |--------------------------------------------------------------------------
-  | AUTH
-  |--------------------------------------------------------------------------
-  */
+  getCurrentUser: () => request<User>('/auth/me'),
 
   login: (email: string, password: string) =>
     request<AuthResponse>('/auth/login', {
@@ -311,11 +317,35 @@ export const api = {
       }
     ),
 
-  getConferenceRegistrations: (
-    conferenceId: string
-  ) =>
-    request<Reservation[]>(
-      `/registrations/conference/${conferenceId}`
-    ),
-};
+getConferenceRegistrations: (
+  conferenceId: string
+) =>
+  request<Reservation[]>(
+    `/registrations/conference/${conferenceId}`
+  ),
 
+getUsers: () => request<SystemUser[]>('/users'),
+
+  createUser: (payload: CreateSystemUserPayload) =>
+    request<SystemUser>('/users', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateUser: (id: string, payload: UpdateSystemUserPayload) =>
+    request<SystemUser>(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  updateUserStatus: (id: string, isActive: boolean) =>
+    request<SystemUser>(`/users/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive }),
+    }),
+
+  resetUserPassword: (id: string) =>
+    request<ResetPasswordResponse>(`/users/${id}/password`, {
+      method: 'PATCH',
+    }),
+};

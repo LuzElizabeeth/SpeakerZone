@@ -14,6 +14,7 @@ CREATE TABLE usuarios (
   email VARCHAR(160) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   rol VARCHAR(30) NOT NULL CHECK (rol IN ('asistente', 'conferencista', 'administrativo')),
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

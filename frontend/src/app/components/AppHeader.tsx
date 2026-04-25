@@ -109,6 +109,14 @@ export const AppHeader: React.FC = () => {
             path: '/admin/stats',
             icon: BarChart3,
           },
+          { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+          { label: 'Usuarios', path: '/admin/users', icon: Users },
+          { label: 'Eventos', path: '/admin/events', icon: Calendar },
+          { label: 'Conferencias', path: '/admin/conferences', icon: Award },
+          { label: 'Conferencistas', path: '/admin/speakers', icon: Users },
+          { label: 'Asistentes', path: '/admin/attendees', icon: Users },
+          { label: 'Escáner QR', path: '/admin/scanner', icon: QrCode },
+          { label: 'Estadísticas', path: '/admin/stats', icon: BarChart3 },
         ];
 
       case 'speaker':

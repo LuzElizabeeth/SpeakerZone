@@ -9,6 +9,7 @@ import eventRoutes from "./routes/eventRoutes.js";
 import speakerRoutes from "./routes/speakerRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
 import programRoutes from "./routes/programRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use("/api/events", eventRoutes(pool));
 app.use("/api/programs", programRoutes(pool));
 app.use("/api/speakers", speakerRoutes(pool));
 app.use("/api/registrations", registrationRoutes(pool));
+app.use("/api/users", userRoutes(pool));
 
 app.get("/", (_req, res) => {
   res.send("SpeakerZone backend funcionando ✅");

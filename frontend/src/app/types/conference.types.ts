@@ -161,3 +161,33 @@ export interface TrendData {
   date: string;
   count: number;
 }
+
+export interface SystemUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  roleLabel: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  linkedSpeakerId: string | null;
+}
+
+export interface CreateSystemUserPayload {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+}
+
+export interface UpdateSystemUserPayload {
+  name: string;
+  email: string;
+  role: UserRole;
+}
+
+export interface ResetPasswordResponse {
+  user: SystemUser;
+  temporaryPassword: string;
+}
