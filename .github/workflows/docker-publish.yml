@@ -84,7 +84,7 @@ jobs:
       - name: Build and push database image
         uses: docker/build-push-action@v6
         with:
-          context: ./database
+          context: .
           file: ./database/Dockerfile
           push: true
           tags: |
