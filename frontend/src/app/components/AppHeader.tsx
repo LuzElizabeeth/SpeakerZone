@@ -162,11 +162,6 @@ export const AppHeader: React.FC = () => {
             icon: FileText,
           },
           {
-            label: 'Calendario',
-            path: '/attendee/calendar',
-            icon: Calendar,
-          },
-          {
             label: 'Mis Inscripciones',
             path: '/attendee/reservations',
             icon: CalendarCheck,
@@ -222,7 +217,7 @@ export const AppHeader: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
+          <nav className="hidden md:flex items-center gap-3 flex-1 justify-center">
             {navLinks.map((link) => {
               const Icon = link.icon;
 
