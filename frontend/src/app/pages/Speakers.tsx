@@ -31,7 +31,7 @@ export const Speakers: React.FC = () => {
             <div className="w-10 h-10 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end rounded-lg flex items-center justify-center">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl text-gray-900">SpeakerZone</span>
+            <span className="text-xl text-gray-900">Hub académico</span>
           </Link>
 
           <Link to="/login" className="px-4 py-2 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white rounded-lg">
@@ -41,8 +41,7 @@ export const Speakers: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl lg:text-4xl mb-3 text-gray-900">Nuestros Conferencistas</h1>
-        <p className="text-lg text-gray-600 mb-6">Conferencistas cargados desde PostgreSQL.</p>
+        <h1 className="text-3xl lg:text-4xl mb-3 text-gray-900">Nuestros conferencistas</h1>
 
         <div className="relative max-w-xl mb-8">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

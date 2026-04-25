@@ -4,7 +4,7 @@ import { router } from './routes';
 import { AuthProvider } from './context/AuthContext';
 
 /**
- * Componente principal de la aplicación SpeakerZone
+ * Componente principal de la aplicación Hub académico
  * Utiliza React Router para la navegación entre páginas
  */
 function App() {

@@ -13,7 +13,7 @@ export const About: React.FC = () => {
               <div className="w-10 h-10 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end rounded-lg flex items-center justify-center">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl text-gray-900">SpeakerZone</span>
+              <span className="text-xl text-gray-900">Hub académico</span>
             </Link>
 
             <div className="flex items-center gap-8">
@@ -42,7 +42,7 @@ export const About: React.FC = () => {
       <section className="bg-gradient-to-br from-blue-light via-white to-purple-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl mb-6 text-gray-900">
-            Acerca de <span className="bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end bg-clip-text text-transparent">SpeakerZone</span>
+            Acerca de <span className="bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end bg-clip-text text-transparent">Hub académico</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Somos la plataforma líder en gestión de conferencias que está revolucionando la forma en que organizadores, conferencistas y asistentes se conectan e interactúan.
@@ -157,7 +157,7 @@ export const About: React.FC = () => {
           <h2 className="text-4xl mb-8 text-center text-gray-900">Nuestra Historia</h2>
           <div className="space-y-6 text-lg text-gray-600">
             <p>
-              SpeakerZone nació en 2024 cuando un grupo de organizadores de eventos se dio cuenta de que 
+              Hub académico nació en 2024 cuando un grupo de organizadores de eventos se dio cuenta de que 
               la mayoría de las herramientas existentes eran demasiado complejas o demasiado simples.
             </p>
             <p>
@@ -166,7 +166,7 @@ export const About: React.FC = () => {
               las conexiones y el conocimiento compartido.
             </p>
             <p>
-              Hoy, miles de organizadores confían en SpeakerZone para gestionar sus eventos, desde 
+              Hoy, miles de organizadores confían en Hub académico para gestionar sus eventos, desde 
               pequeños meetups hasta conferencias internacionales con miles de asistentes.
             </p>
           </div>
@@ -207,10 +207,10 @@ export const About: React.FC = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end rounded-lg flex items-center justify-center">
                 <Zap className="w-5 h-5 text-white" />
               </div>
-              <span className="text-gray-900">SpeakerZone</span>
+              <span className="text-gray-900">Hub académico</span>
             </div>
             <p className="text-sm text-gray-500">
-              © 2026 SpeakerZone. Todos los derechos reservados.
+              © 2026 Hub académico. Todos los derechos reservados.
             </p>
           </div>
         </div>

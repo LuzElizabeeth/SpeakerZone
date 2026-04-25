@@ -238,7 +238,7 @@ export const AttendeeHistory: React.FC = () => {
         {/* Timeline Summary */}
         {filteredHistory.length > 0 && (
           <Card className="p-6 mt-8 bg-gradient-to-br from-blue-gradient-start to-blue-gradient-end text-white">
-            <h3 className="text-xl mb-4">Tu Trayectoria en SpeakerZone</h3>
+            <h3 className="text-xl mb-4">Tu Trayectoria en Hub académico</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-3xl mb-1">{stats.totalAttended}</p>

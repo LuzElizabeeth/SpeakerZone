@@ -28,7 +28,7 @@ export const Landing: React.FC = () => {
               <div className="w-10 h-10 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end rounded-lg flex items-center justify-center">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl text-gray-900">SpeakerZone</span>
+              <span className="text-xl text-gray-900">Hub académico</span>
             </Link>
 
             {/* Navigation Links */}
@@ -97,7 +97,7 @@ export const Landing: React.FC = () => {
               </h1>
 
               <p className="text-xl text-gray-600 mb-8">
-                SpeakerZone optimiza el registro, control de aforo y reserva de plazas para conferencias, 
+                Hub académico optimiza el registro, control de aforo y reserva de plazas para conferencias, 
                 eliminando procesos manuales y mejorando la experiencia de todos los participantes.
               </p>
 
@@ -279,7 +279,7 @@ export const Landing: React.FC = () => {
             ¿Listo para transformar tus conferencias?
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Únete a cientos de organizadores que ya confían en SpeakerZone
+            Únete a cientos de organizadores que ya confían en este Hub académico
           </p>
           <Link
             to="/dashboard"
@@ -299,10 +299,10 @@ export const Landing: React.FC = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end rounded-lg flex items-center justify-center">
                 <Zap className="w-5 h-5 text-white" />
               </div>
-              <span className="text-gray-900">SpeakerZone</span>
+              <span className="text-gray-900">Hub académico</span>
             </div>
             <p className="text-sm text-gray-500">
-              © 2026 SpeakerZone. Todos los derechos reservados.
+              © 2026 Hub académico. Todos los derechos reservados.
             </p>
           </div>
         </div>

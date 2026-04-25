@@ -1,4 +1,4 @@
-# 🎤 SpeakerZone TecNM
+# 🎤 Hub académico
 
 Sistema web para la gestión de conferencias, ponentes y asistentes dentro del Tecnológico Nacional de México.
 
@@ -6,7 +6,7 @@ Sistema web para la gestión de conferencias, ponentes y asistentes dentro del T
 
 ## 🚀 Descripción
 
-**SpeakerZone** es una plataforma diseñada para administrar eventos académicos, permitiendo:
+**Hub académico** es una plataforma diseñada para administrar eventos académicos, permitiendo:
 
 * 📢 Gestión de conferencias
 * 👨‍🏫 Administración de ponentes

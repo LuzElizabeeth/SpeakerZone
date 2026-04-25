@@ -58,7 +58,7 @@ app.use("/api/registrations", registrationRoutes(pool));
 app.use("/api/users", userRoutes(pool));
 
 app.get("/", (_req, res) => {
-  res.send("SpeakerZone backend funcionando ✅");
+  res.send("Hub académico backend funcionando ✅");
 });
 
 app.get("/api/db-check", async (_req, res) => {
