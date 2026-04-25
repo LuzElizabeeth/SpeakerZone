@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { 
-  Zap, 
-  LogOut, 
-  User, 
+import {
+  Zap,
+  LogOut,
+  User,
   ChevronDown,
   LayoutDashboard,
   Calendar,
+  CalendarCheck,
   Users,
   Award,
   Info,
@@ -15,7 +16,7 @@ import {
   QrCode,
   FileText,
   History,
-  MapPin
+  MapPin,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -62,14 +63,15 @@ export const AppHeader: React.FC = () => {
         ];
       
       case 'attendee':
-      default:
-        return [
-          { label: 'Inicio', path: '/attendee/dashboard', icon: LayoutDashboard },
-          { label: 'Eventos', path: '/attendee/events', icon: MapPin },
-          { label: 'Mi QR', path: '/attendee/qr', icon: QrCode },
-          { label: 'Certificados', path: '/attendee/certificates', icon: Award },
-          { label: 'Historial', path: '/attendee/history', icon: History },
-        ];
+        default:
+          return [
+            { label: 'Inicio', path: '/attendee/dashboard', icon: LayoutDashboard },
+            { label: 'Eventos', path: '/attendee/events', icon: MapPin },
+            { label: 'Mis Reservas', path: '/attendee/reservations', icon: CalendarCheck },
+            { label: 'Mi QR', path: '/attendee/qr', icon: QrCode },
+            { label: 'Certificados', path: '/attendee/certificates', icon: Award },
+            { label: 'Historial', path: '/attendee/history', icon: History },
+          ];
     }
   };
 

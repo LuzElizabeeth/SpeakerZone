@@ -24,27 +24,55 @@ export const Login: React.FC = () => {
 
     try {
       if (isLogin) {
-        await login(formData.email, formData.password, selectedRole);
+        const authenticatedUser = await login(formData.email, formData.password);
+
         toast.success('¡Bienvenido de vuelta!');
-        
-        // Redirigir según el rol
-        switch (selectedRole) {
+
+        switch (authenticatedUser.role) {
           case 'admin':
             navigate('/admin/dashboard');
             break;
+
           case 'speaker':
             navigate('/speaker/dashboard');
             break;
+
+          case 'attendee':
           default:
             navigate('/attendee/dashboard');
+            break;
         }
       } else {
-        await register(formData.name, formData.email, formData.password);
+        const registeredUser = await register(
+          formData.name,
+          formData.email,
+          formData.password,
+          'attendee'
+        );
+
         toast.success('¡Cuenta creada exitosamente!');
-        navigate('/attendee/dashboard');
+
+        switch (registeredUser.role) {
+          case 'admin':
+            navigate('/admin/dashboard');
+            break;
+
+          case 'speaker':
+            navigate('/speaker/dashboard');
+            break;
+
+          case 'attendee':
+          default:
+            navigate('/attendee/dashboard');
+            break;
+        }
       }
     } catch (error) {
-      toast.error('Error al procesar la solicitud. Intenta de nuevo.');
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Error al procesar la solicitud. Intenta de nuevo.'
+      );
     } finally {
       setIsLoading(false);
     }

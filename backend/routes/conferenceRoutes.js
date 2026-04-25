@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticateToken, authorizeRoles } from "../middleware/authMiddleware.js";
 
 const mapConference = (row) => ({
   id: row.id,
@@ -114,7 +115,7 @@ const conferenceRoutes = (pool) => {
     }
   });
 
-  router.post("/", async (req, res) => {
+  router.post("/", authenticateToken, authorizeRoles("admin"), async (req, res) => {
     try {
       const { eventId, speakerId, title, description, date, time, endTime, location, type, capacity, imageUrl, tags } = req.body;
       if (!eventId || !title || !date || !time || !location) {
@@ -151,7 +152,7 @@ const conferenceRoutes = (pool) => {
     }
   });
 
-  router.put("/:id", async (req, res) => {
+  router.put("/:id", authenticateToken, authorizeRoles("admin"), async (req, res) => {
     try {
       const { speakerId, title, description, date, time, endTime, location, type, capacity, imageUrl, tags, status } = req.body;
       const result = await pool.query(
@@ -200,7 +201,7 @@ const conferenceRoutes = (pool) => {
     }
   });
 
-  router.delete("/:id", async (req, res) => {
+  router.delete("/:id", authenticateToken, authorizeRoles("admin"), async (req, res) => {
     try {
       const result = await pool.query("DELETE FROM conferences WHERE id = $1 RETURNING id", [req.params.id]);
       if (result.rows.length === 0) return res.status(404).json({ error: "Conferencia no encontrada" });

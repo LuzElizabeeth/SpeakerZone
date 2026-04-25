@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticateToken, authorizeRoles } from "../middleware/authMiddleware.js";
 
 const mapSpeaker = (row) => ({
   id: row.id,
@@ -30,7 +31,7 @@ const speakerRoutes = (pool) => {
     }
   });
 
-  router.post("/", async (req, res) => {
+  router.post("/", authenticateToken, authorizeRoles("admin"), async (req, res) => {
     const { name, role, bio, organization, avatarUrl } = req.body;
 
     if (!name || !role || !organization) {
@@ -51,7 +52,7 @@ const speakerRoutes = (pool) => {
     }
   });
 
-  router.put("/:id", async (req, res) => {
+  router.put("/:id", authenticateToken, authorizeRoles("admin"), async (req, res) => {
     const { name, role, bio, organization, avatarUrl } = req.body;
 
     try {
@@ -76,15 +77,27 @@ const speakerRoutes = (pool) => {
     }
   });
 
-  router.delete("/:id", async (req, res) => {
-    try {
-      await pool.query("DELETE FROM speakers WHERE id = $1", [req.params.id]);
-      res.json({ ok: true });
-    } catch (error) {
-      console.error("Error al eliminar conferencista:", error);
-      res.status(500).json({ error: "Error al eliminar conferencista" });
+  router.delete("/:id", authenticateToken, authorizeRoles("admin"), async (req, res) => {
+  try {
+    const result = await pool.query(
+      "DELETE FROM speakers WHERE id = $1 RETURNING id",
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Conferencista no encontrado",
+      });
     }
-  });
+
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("Error al eliminar conferencista:", error);
+    res.status(500).json({
+      error: "Error al eliminar conferencista",
+    });
+  }
+});
 
   return router;
 };

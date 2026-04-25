@@ -1,4 +1,6 @@
+import React from 'react';
 import { createBrowserRouter } from 'react-router';
+
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -6,6 +8,10 @@ import Speakers from './pages/Speakers';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
 import ConferenceDetail from './pages/ConferenceDetail';
+import Settings from './pages/Settings';
+
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { UserRole } from './types/conference.types';
 
 // Speaker pages
 import SpeakerDashboard from './pages/speaker/SpeakerDashboard';
@@ -30,10 +36,22 @@ import AttendeeQRCode from './pages/attendee/AttendeeQRCode';
 import AttendeeCertificates from './pages/attendee/AttendeeCertificates';
 import AttendeeHistory from './pages/attendee/AttendeeHistory';
 import AttendeeDashboard from './pages/attendee/AttendeeDashboard';
+import AttendeeReservations from './pages/attendee/AttendeeReservations';
+import AttendeeEventDetail from './pages/attendee/AttendeeEventDetail';
 
-/**
- * Configuración de rutas usando React Router Data Mode
- */
+const withAuth = (
+  Component: React.ComponentType,
+  allowedRoles?: UserRole[]
+) => {
+  return function ProtectedPage() {
+    return React.createElement(
+      ProtectedRoute,
+      { allowedRoles },
+      React.createElement(Component)
+    );
+  };
+};
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -59,81 +77,97 @@ export const router = createBrowserRouter([
     path: '/about',
     Component: About,
   },
+  {
+    path: '/settings',
+    Component: withAuth(Settings),
+  },
+
   // Speaker routes
   {
     path: '/speaker/dashboard',
-    Component: SpeakerDashboard,
+    Component: withAuth(SpeakerDashboard, ['speaker']),
   },
   {
     path: '/speaker/conferences',
-    Component: SpeakerConferences,
+    Component: withAuth(SpeakerConferences, ['speaker']),
   },
   {
     path: '/speaker/attendees',
-    Component: SpeakerAttendees,
+    Component: withAuth(SpeakerAttendees, ['speaker']),
   },
   {
     path: '/speaker/certificates',
-    Component: SpeakerCertificates,
+    Component: withAuth(SpeakerCertificates, ['speaker']),
   },
   {
     path: '/speaker/profile',
-    Component: SpeakerProfile,
+    Component: withAuth(SpeakerProfile, ['speaker']),
   },
+
   // Admin routes
   {
     path: '/admin/dashboard',
-    Component: AdminDashboard,
+    Component: withAuth(AdminDashboard, ['admin']),
   },
   {
     path: '/admin/events',
-    Component: AdminEvents,
+    Component: withAuth(AdminEvents, ['admin']),
   },
   {
     path: '/admin/conferences',
-    Component: AdminConferences,
+    Component: withAuth(AdminConferences, ['admin']),
   },
   {
     path: '/admin/speakers',
-    Component: AdminSpeakers,
+    Component: withAuth(AdminSpeakers, ['admin']),
   },
   {
     path: '/admin/attendees',
-    Component: AdminAttendees,
+    Component: withAuth(AdminAttendees, ['admin']),
   },
   {
     path: '/admin/scanner',
-    Component: AdminScanner,
+    Component: withAuth(AdminScanner, ['admin']),
   },
   {
     path: '/admin/stats',
-    Component: AdminStats,
+    Component: withAuth(AdminStats, ['admin']),
   },
+
   // Attendee routes
   {
     path: '/attendee/dashboard',
-    Component: AttendeeDashboard,
+    Component: withAuth(AttendeeDashboard, ['attendee']),
   },
   {
     path: '/attendee/profile',
-    Component: AttendeeProfile,
+    Component: withAuth(AttendeeProfile, ['attendee']),
   },
   {
     path: '/attendee/events',
-    Component: AttendeeEvents,
+    Component: withAuth(AttendeeEvents, ['attendee']),
+  },
+  {
+    path: '/attendee/event/:id',
+    Component: withAuth(AttendeeEventDetail, ['attendee']),
+  },
+  {
+    path: '/attendee/reservations',
+    Component: withAuth(AttendeeReservations, ['attendee']),
   },
   {
     path: '/attendee/qr',
-    Component: AttendeeQRCode,
+    Component: withAuth(AttendeeQRCode, ['attendee']),
   },
   {
     path: '/attendee/certificates',
-    Component: AttendeeCertificates,
+    Component: withAuth(AttendeeCertificates, ['attendee']),
   },
   {
     path: '/attendee/history',
-    Component: AttendeeHistory,
+    Component: withAuth(AttendeeHistory, ['attendee']),
   },
+
   {
     path: '*',
     Component: NotFound,

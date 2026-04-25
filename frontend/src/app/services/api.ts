@@ -10,6 +10,22 @@ export interface SpeakerPayload {
   avatarUrl?: string;
 }
 
+export interface ConferencePayload {
+  eventId?: string;
+  speakerId?: string;
+  title: string;
+  description?: string;
+  date: string;
+  time: string;
+  endTime?: string;
+  location: string;
+  type?: string;
+  capacity?: number;
+  imageUrl?: string;
+  tags?: string[];
+  status?: string;
+}
+
 export interface EventFromApi {
   id: string;
   name: string;
@@ -56,7 +72,12 @@ export const api = {
       body: JSON.stringify({ email, password }),
     }),
 
-  register: (name: string, email: string, password: string, role: UserRole = 'attendee') =>
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    role: UserRole = 'attendee'
+  ) =>
     request<AuthResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ name, email, password, role }),
@@ -64,10 +85,31 @@ export const api = {
 
   getEvents: () => request<EventFromApi[]>('/events'),
 
+  getEventById: (id: string) => request<EventFromApi>(`/events/${id}`),
+
   getConferences: () => request<Conference[]>('/conferences'),
+
   getConferenceById: (id: string) => request<Conference>(`/conferences/${id}`),
 
-  getSpeakers: () => request<(Speaker & { totalConferences: number })[]>('/speakers'),
+  createConference: (payload: ConferencePayload) =>
+    request<Conference>('/conferences', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateConference: (id: string, payload: Partial<ConferencePayload>) =>
+    request<Conference>(`/conferences/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteConference: (id: string) =>
+    request<{ ok: boolean }>(`/conferences/${id}`, {
+      method: 'DELETE',
+    }),
+
+  getSpeakers: () =>
+    request<(Speaker & { totalConferences: number })[]>('/speakers'),
 
   createSpeaker: (payload: SpeakerPayload) =>
     request<Speaker & { totalConferences: number }>('/speakers', {
