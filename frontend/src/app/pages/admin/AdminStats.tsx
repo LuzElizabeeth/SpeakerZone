@@ -36,9 +36,24 @@ export const AdminStats: React.FC = () => {
 
   // Datos para gráficas
   const conferenceTypeData = [
-    { name: 'Presencial', value: mockConferences.filter(c => c.type === 'presencial').length, color: '#3B82F6' },
-    { name: 'Virtual', value: mockConferences.filter(c => c.type === 'virtual').length, color: '#10B981' },
-    { name: 'Híbrida', value: mockConferences.filter(c => c.type === 'híbrida').length, color: '#8B5CF6' }
+    {
+      name: 'Presencial',
+      value: mockConferences.filter((c) => c.type === 'presencial').length,
+      color: '#3B82F6',
+      indicatorClassName: 'bg-blue-500',
+    },
+    {
+      name: 'Virtual',
+      value: mockConferences.filter((c) => c.type === 'virtual').length,
+      color: '#10B981',
+      indicatorClassName: 'bg-green-500',
+    },
+    {
+      name: 'Híbrida',
+      value: mockConferences.filter((c) => c.type === 'híbrida').length,
+      color: '#8B5CF6',
+      indicatorClassName: 'bg-purple-500',
+    },
   ];
 
   const attendanceByConference = mockConferences.slice(0, 5).map(conf => ({
@@ -206,10 +221,7 @@ export const AdminStats: React.FC = () => {
               {conferenceTypeData.map((type) => (
                 <div key={type.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: type.color }}
-                    />
+                    <div className={`w-3 h-3 rounded-full ${type.indicatorClassName}`} />
                     <span className="text-sm text-gray-700">{type.name}</span>
                   </div>
                   <span className="text-sm text-gray-900">{type.value}</span>

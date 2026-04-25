@@ -45,6 +45,7 @@ export const AppHeader: React.FC = () => {
       case 'admin':
         return [
           { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+          { label: 'Usuarios', path: '/admin/users', icon: Users },
           { label: 'Eventos', path: '/admin/events', icon: Calendar },
           { label: 'Conferencias', path: '/admin/conferences', icon: Award },
           { label: 'Conferencistas', path: '/admin/speakers', icon: Users },

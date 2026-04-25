@@ -28,6 +28,7 @@ import AdminSpeakers from './pages/admin/AdminSpeakers';
 import AdminAttendees from './pages/admin/AdminAttendees';
 import AdminScanner from './pages/admin/AdminScanner';
 import AdminStats from './pages/admin/AdminStats';
+import AdminUsers from './pages/admin/AdminUsers';
 
 // Attendee pages
 import AttendeeProfile from './pages/attendee/AttendeeProfile';
@@ -44,11 +45,10 @@ const withAuth = (
   allowedRoles?: UserRole[]
 ) => {
   return function ProtectedPage() {
-    return React.createElement(
-      ProtectedRoute,
-      { allowedRoles },
-      React.createElement(Component)
-    );
+    return React.createElement(ProtectedRoute, {
+      allowedRoles,
+      children: React.createElement(Component),
+    });
   };
 };
 
@@ -132,6 +132,10 @@ export const router = createBrowserRouter([
   {
     path: '/admin/stats',
     Component: withAuth(AdminStats, ['admin']),
+  },
+  {
+    path: '/admin/users',
+    Component: withAuth(AdminUsers, ['admin']),
   },
 
   // Attendee routes
