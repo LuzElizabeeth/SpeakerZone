@@ -1,0 +1,48 @@
+services:
+  db:
+    image: mezzikeen/speakerzone-db:latest
+    container_name: speakerzone_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: speakerzone_dev_password
+      POSTGRES_DB: speakerzone_tecnm
+    volumes:
+      - speakerzone_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d speakerzone_tecnm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: mezzikeen/speakerzone-backend:latest
+    container_name: speakerzone_backend
+    restart: unless-stopped
+    environment:
+      PORT: 5001
+      JWT_SECRET: cambiar_en_servidor
+      DB_USER: postgres
+      DB_HOST: db
+      DB_NAME: speakerzone_tecnm
+      DB_PASS: speakerzone_dev_password
+      DB_PORT: 5432
+      DB_SSL: "false"
+    volumes:
+      - speakerzone_uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: mezzikeen/speakerzone-frontend:latest
+    container_name: speakerzone_frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  speakerzone_pgdata:
+  speakerzone_uploads:
