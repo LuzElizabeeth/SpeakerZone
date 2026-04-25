@@ -19,13 +19,9 @@ const pool = new Pool(
   useDatabaseUrl
     ? {
         connectionString: process.env.DATABASE_URL,
-        ...(useSsl
-          ? {
-              ssl: {
-                rejectUnauthorized: false,
-              },
-            }
-          : {}),
+        ssl: {
+          rejectUnauthorized: false,
+        },
       }
     : {
         user: process.env.DB_USER || "postgres",
