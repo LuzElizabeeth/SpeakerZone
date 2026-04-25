@@ -18,18 +18,20 @@ VALUES (
 
 INSERT INTO speakers (id, name, role, bio, organization, avatar_url)
 VALUES
-('10000000-0000-0000-0000-000000000001','Comité Organizador','Responsable del evento','Equipo organizador de la Jornada ISC.','Instituto Tecnológico de Cancún',''),
-('10000000-0000-0000-0000-000000000002','Cecilio Chi','Responsable de actividad','Participa en la inauguración OMEGA UP y reconocimiento a la academia.','Academia ISC',''),
-('10000000-0000-0000-0000-000000000003','Comité de programación','Organizador','Equipo responsable de los concursos de programación.','Instituto Tecnológico de Cancún',''),
-('10000000-0000-0000-0000-000000000004','Roger','Conferencista','Conferencista invitado para temas de data center y redes.','TrippLite / Cisco',''),
-('10000000-0000-0000-0000-000000000005','Gaby','Conferencista','Conferencista invitada de Salto Systems.','Salto Systems',''),
-('10000000-0000-0000-0000-000000000006','Comité Hackatec','Organizador','Equipo responsable de las actividades Hackatec.','Instituto Tecnológico de Cancún',''),
-('10000000-0000-0000-0000-000000000007','Freddy','Conferencista','Conferencista invitado para el tema Construye tu éxito.','TrippLite',''),
-('10000000-0000-0000-0000-000000000008','Octavio','Responsable Hackatec','Responsable de inicio, cierre y premiación de Hackatec.','Instituto Tecnológico de Cancún',''),
-('10000000-0000-0000-0000-000000000009','Francisco Mis C.','Tallerista','Tallerista de fibra óptica y PON-LAN Network.','Mistel Comunicaciones',''),
-('10000000-0000-0000-0000-000000000010','Israel Cupul','Conferencista','Conferencista del tema Porque *NIX.','Instituto Tecnológico de Cancún',''),
-('10000000-0000-0000-0000-000000000011','Ciro','Conferencista','Conferencista sobre telecomunicaciones modernas.','Cisco',''),
-('10000000-0000-0000-0000-000000000012','Luis Tejeda','Conferencista','Conferencista sobre Kubernetes y Docker.','Por confirmar','');
+('10000000-0000-0000-0000-000000000001','Miguel Eduardo Romero Ruiz','Conferencista Magistral','Ponente de la conferencia magistral "LLM''s vs Real Thinking".','Omega Up',''),
+('10000000-0000-0000-0000-000000000002','Francisco Mis C.','Tallerista','Ponente del taller de fibra óptica y PON-LAN Network.','Mistel Comunicaciones',''),
+('10000000-0000-0000-0000-000000000003','Freddy Canul Vargas','Conferencista','Senior Sales Manager y gerente regional de ventas y proyectos. Participa con stand y conferencia sobre energía en el Data Center.','Eaton - Tripp Lite',''),
+('10000000-0000-0000-0000-000000000004','Gabriela Castillo','Conferencista','Regional Sales Manager. Participa con conferencia sobre controles de acceso inteligentes, on premise y en la nube.','Salto Systems',''),
+('10000000-0000-0000-0000-000000000005','Ing. Jorge Marcial','Conferencista','Representante de Dahua. Ponente de IA impulsada en seguridad electrónica.','Dahua',''),
+('10000000-0000-0000-0000-000000000006','Roger Antonio Munguia Mairena','Conferencista','Ponente de Cisco para la conferencia Introducción a las Redes.','Cisco',''),
+('10000000-0000-0000-0000-000000000007','Israel Cupul','Conferencista','Ponente de la conferencia ¿Por qué *NIX?','IT Cancún',''),
+('10000000-0000-0000-0000-000000000008','José Jonathan Tuyub Uc','Conferencista','Ponente de la conferencia Seguridad - Conceptos básicos de pentest.','Por confirmar',''),
+('10000000-0000-0000-0000-000000000009','Dr. Pedro Ortiz','Conferencista','Ponente de la conferencia sobre uso de IA generativa como apoyo para proyectos y documentos.','IT Mérida',''),
+('10000000-0000-0000-0000-000000000010','Ciro Ramón Juárez Melchor','Conferencista','Ponente de la conferencia Detrás de la red: diseño, desarrollo e implementación en telecomunicaciones modernas.','Cisco / NetDreamTeam',''),
+('10000000-0000-0000-0000-000000000011','Ing. Melisa Murua','Conferencista','Ponente de la conferencia sobre evolución de la IA y prevención de ciberataques.','Por confirmar',''),
+('10000000-0000-0000-0000-000000000012','Luis Tejeda','Conferencista','Ponente de la conferencia Kubernetes vs Docker.','Por confirmar',''),
+('10000000-0000-0000-0000-000000000013','Carlos Zarate','Tallerista','Ponente del taller Fibra Óptica en instalaciones de Telmex.','Telmex',''),
+('10000000-0000-0000-0000-000000000014','Alejandro Padilla','Tallerista','Ponente del taller Fibra Óptica en instalaciones de Telmex.','Telmex','');
 
 INSERT INTO conferences (id, event_id, speaker_id, title, description, conference_date, start_time, end_time, location, type, status, capacity, image_url, tags)
 VALUES
