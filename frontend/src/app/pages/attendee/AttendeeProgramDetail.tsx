@@ -317,94 +317,83 @@ export const AttendeeProgramDetail: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {filteredActivities.map(
-                    (activity) => (
-                      <Card
-                        key={activity.id}
-                        className="p-6"
-                      >
-                        <div className="flex items-start justify-between gap-4 mb-4">
-                          <div>
-                                 <Card  className="overflow-hidden hover:shadow-lg transition-shadow">
-                                <img
-                                    src={activity.imageUrl}
-                                    alt={activity.title}
-                                    className="w-full h-48 object-cover"
-                                />
-                       
-                            </Card>
-                            <h3 className="text-xl text-gray-900 mb-2">
-                              {
-                                activity.title
-                              }
-                            </h3>
+  {filteredActivities.map((activity) => (
+    <Card
+      key={activity.id}
+      className="overflow-hidden hover:shadow-lg transition-shadow"
+    >
+      {/* Imagen full width */}
+      <img
+        src={
+          activity.imageUrl ||
+          'https://images.unsplash.com/photo-1540575467063-178a50c2df87'
+        }
+        alt={activity.title}
+        className="w-full h-44 object-cover"
+      />
 
-                            {getTypeBadge(
-                              activity.activityType
-                            )}
-                          </div>
-                        </div>
+      {/* Todo el contenido va dentro del mismo div */}
+      <div className="p-5">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 className="text-xl text-gray-900 mb-2">
+              {activity.title}
+            </h3>
 
-                        <div className="space-y-3 mb-6 text-sm text-gray-600">
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4" />
+            {getTypeBadge(activity.activityType)}
+          </div>
+        </div>
 
-                            <span>
-                              {
-                                activity
-                                  .speaker
-                                  ?.name
-                              }
-                            </span>
-                          </div>
+        {/* Info */}
+        <div className="space-y-3 mb-5 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
 
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4" />
+            <span>
+              {activity.speaker?.name}
+            </span>
+          </div>
 
-                            <span>
-                              {
-                                activity.time
-                              }
-                            </span>
-                          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4" />
 
-                          <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4" />
+            <span>
+              {activity.time}
+            </span>
+          </div>
 
-                            <span>
-                              {
-                                activity.location
-                              }
-                            </span>
-                          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
 
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4" />
+            <span>
+              {activity.location}
+            </span>
+          </div>
 
-                            <span>
-                              {
-                                activity.capacity
-                              }{' '}
-                              lugares
-                              disponibles
-                            </span>
-                          </div>
-                        </div>
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
 
-                        <Link
-                          to={`/attendee/activities/${activity.id}`}
-                        >
-                          <Button className="w-full bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white">
-                            Ver detalles e
-                            inscribirme
+            <span>
+              {activity.capacity} lugares disponibles
+            </span>
+          </div>
+        </div>
 
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </Link>
-                      </Card>
-                    )
-                  )}
-                </div>
+        {/* Botón */}
+        <Link
+          to={`/attendee/activities/${activity.id}`}
+        >
+          <Button className="w-full bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white">
+            Ver detalles e inscribirme
+
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </Link>
+      </div>
+    </Card>
+  ))}
+</div>
               </section>
             </>
           )}

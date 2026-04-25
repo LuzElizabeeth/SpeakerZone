@@ -31,13 +31,11 @@ import AdminStats from './pages/admin/AdminStats';
 
 // Attendee pages
 import AttendeeProfile from './pages/attendee/AttendeeProfile';
-import AttendeeEvents from './pages/attendee/AttendeeEvents';
 import AttendeeQRCode from './pages/attendee/AttendeeQRCode';
 import AttendeeCertificates from './pages/attendee/AttendeeCertificates';
 import AttendeeHistory from './pages/attendee/AttendeeHistory';
 import AttendeeDashboard from './pages/attendee/AttendeeDashboard';
 import AttendeeReservations from './pages/attendee/AttendeeReservations';
-import AttendeeEventDetail from './pages/attendee/AttendeeEventDetail';
 import AttendeeProgramList from './pages/attendee/AttendeeProgramList';
 import AttendeeProgramDetail from './pages/attendee/AttendeeProgramDetail';
 import AttendeeActivityDetail from './pages/attendee/AttendeeActivityDetail';
@@ -51,8 +49,10 @@ const withAuth = (
   return function ProtectedPage() {
     return React.createElement(
       ProtectedRoute,
-      { allowedRoles },
-      React.createElement(Component)
+      {
+        allowedRoles,
+        children: React.createElement(Component),
+      }
     );
   };
 };
@@ -147,14 +147,6 @@ export const router = createBrowserRouter([
   {
     path: '/attendee/profile',
     Component: withAuth(AttendeeProfile, ['attendee']),
-  },
-  {
-    path: '/attendee/events',
-    Component: withAuth(AttendeeEvents, ['attendee']),
-  },
-  {
-    path: '/attendee/event/:id',
-    Component: withAuth(AttendeeEventDetail, ['attendee']),
   },
   {
     path: '/attendee/reservations',
