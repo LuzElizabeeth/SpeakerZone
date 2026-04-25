@@ -279,7 +279,7 @@ export const Landing: React.FC = () => {
             ¿Listo para transformar tus conferencias?
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Únete a cientos de organizadores que ya confían en Hub académico
+            Únete a cientos de organizadores que ya confían en este Hub académico
           </p>
           <Link
             to="/dashboard"

@@ -132,12 +132,8 @@ export const Dashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl lg:text-4xl mb-3 text-gray-900">
-            Conferencias Disponibles
+            Conferencias disponibles
           </h1>
-
-          <p className="text-lg text-gray-600">
-            Datos cargados desde PostgreSQL mediante la API del backend.
-          </p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">

@@ -41,8 +41,7 @@ export const Speakers: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl lg:text-4xl mb-3 text-gray-900">Nuestros Conferencistas</h1>
-        <p className="text-lg text-gray-600 mb-6">Conferencistas cargados desde PostgreSQL.</p>
+        <h1 className="text-3xl lg:text-4xl mb-3 text-gray-900">Nuestros conferencistas</h1>
 
         <div className="relative max-w-xl mb-8">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
