@@ -4,14 +4,14 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
-  Info,
   Lock,
   LogIn,
   Mail,
-  Shield,
   User,
   UserPlus,
-  Users,
+  CalendarCheck,
+  QrCode,
+  ShieldCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
@@ -20,42 +20,6 @@ import { UserRole } from '../types/conference.types';
 interface LoginLocationState {
   from?: string;
 }
-
-interface DemoCredential {
-  label: string;
-  role: UserRole;
-  email: string;
-  password: string;
-  description: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const demoCredentials: DemoCredential[] = [
-  {
-    label: 'Administrador',
-    role: 'admin',
-    email: 'admin@speakerzone.com',
-    password: '123456',
-    description: 'Gestión de eventos, conferencias, speakers y registros.',
-    icon: Shield,
-  },
-  {
-    label: 'Conferencista',
-    role: 'speaker',
-    email: 'speaker@speakerzone.com',
-    password: '123456',
-    description: 'Panel de conferencista y consulta de asistentes.',
-    icon: Users,
-  },
-  {
-    label: 'Asistente',
-    role: 'attendee',
-    email: 'asistente@speakerzone.com',
-    password: '123456',
-    description: 'Reserva de conferencias y consulta de QR.',
-    icon: User,
-  },
-];
 
 const getHomePathByRole = (role?: UserRole) => {
   switch (role) {
@@ -94,12 +58,6 @@ export const Login: React.FC = () => {
   const [rememberSession, setRememberSession] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  /**
-   * Las credenciales demo solo se muestran en desarrollo local.
-   * En producción/Docker no aparecen en la pantalla de login.
-   */
-  const showDemoCredentials = import.meta.env.DEV;
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -127,6 +85,7 @@ export const Login: React.FC = () => {
   const resetFormState = (nextIsLogin: boolean) => {
     setIsLogin(nextIsLogin);
     setShowPassword(false);
+    setRememberSession(true);
     setFormData({
       name: '',
       email: '',
@@ -134,14 +93,33 @@ export const Login: React.FC = () => {
     });
   };
 
-  const handleFillDemo = (credential: DemoCredential) => {
-    setIsLogin(true);
-    setFormData({
-      name: '',
-      email: credential.email,
-      password: credential.password,
-    });
-    setRememberSession(true);
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      name: value,
+    }));
+  };
+
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      email: value,
+    }));
+  };
+
+  const handlePasswordChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      password: value,
+    }));
   };
 
   const validateForm = () => {
@@ -166,8 +144,8 @@ export const Login: React.FC = () => {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
     if (!validateForm()) return;
 
@@ -176,7 +154,7 @@ export const Login: React.FC = () => {
     try {
       if (isLogin) {
         const authenticatedUser = await login(
-          formData.email,
+          formData.email.trim().toLowerCase(),
           formData.password,
           rememberSession
         );
@@ -185,14 +163,14 @@ export const Login: React.FC = () => {
         redirectAfterAuth(authenticatedUser.role);
       } else {
         const registeredUser = await register(
-          formData.name,
-          formData.email,
+          formData.name.trim(),
+          formData.email.trim().toLowerCase(),
           formData.password,
           'attendee',
           rememberSession
         );
 
-        toast.success('Cuenta de asistente creada correctamente.');
+        toast.success('Cuenta creada correctamente.');
         redirectAfterAuth(registeredUser.role);
       }
     } catch (error) {
@@ -230,68 +208,14 @@ export const Login: React.FC = () => {
           </Link>
 
           <h1 className="text-3xl mb-2 text-gray-900">
-            {isLogin ? 'Iniciar sesión' : 'Crear cuenta de asistente'}
+            {isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
           </h1>
 
           <p className="text-gray-600 mb-6">
             {isLogin
-              ? 'Accede con tu correo y contraseña. El rol se detecta automáticamente desde la base de datos.'
-              : 'El registro público crea únicamente cuentas de asistente.'}
+              ? 'Accede con tu correo y contraseña para continuar.'
+              : 'Crea una cuenta para reservar conferencias y consultar tus accesos.'}
           </p>
-
-          {isLogin && showDemoCredentials && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-accent mt-0.5" />
-
-                <div>
-                  <h2 className="text-sm text-gray-900 mb-2">
-                    Credenciales demo de desarrollo
-                  </h2>
-
-                  <p className="text-xs text-gray-600 mb-3">
-                    Estas cuentas solo se muestran en desarrollo local. En
-                    producción no aparecen dentro del login.
-                  </p>
-
-                  <div className="space-y-2">
-                    {demoCredentials.map((credential) => {
-                      const Icon = credential.icon;
-
-                      return (
-                        <button
-                          key={credential.email}
-                          type="button"
-                          onClick={() => handleFillDemo(credential)}
-                          className="w-full text-left bg-white border border-blue-100 rounded-lg p-3 hover:border-blue-accent hover:shadow-sm transition-all"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-blue-light flex items-center justify-center">
-                              <Icon className="w-5 h-5 text-blue-accent" />
-                            </div>
-
-                            <div className="min-w-0">
-                              <p className="text-sm text-gray-900">
-                                {credential.label}
-                              </p>
-
-                              <p className="text-xs text-gray-500 truncate">
-                                {credential.email} / {credential.password}
-                              </p>
-
-                              <p className="text-xs text-gray-400 truncate">
-                                {credential.description}
-                              </p>
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
@@ -312,11 +236,9 @@ export const Login: React.FC = () => {
                     type="text"
                     required={!isLogin}
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={handleNameChange}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all"
-                    placeholder="Juan Pérez"
+                    placeholder="Tu nombre completo"
                     autoComplete="name"
                   />
                 </div>
@@ -340,9 +262,7 @@ export const Login: React.FC = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
+                  onChange={handleEmailChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all"
                   placeholder="tu@email.com"
                   autoComplete="username"
@@ -362,22 +282,20 @@ export const Login: React.FC = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
 
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all"
-                  placeholder="tu@email.com"
-                  autoComplete="username"
+                  value={formData.password}
+                  onChange={handlePasswordChange}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all"
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
                 />
 
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword((prev) => !prev)}
                   aria-label={
                     showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
                   }
@@ -400,7 +318,9 @@ export const Login: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={rememberSession}
-                  onChange={(e) => setRememberSession(e.target.checked)}
+                  onChange={(event) =>
+                    setRememberSession(event.target.checked)
+                  }
                   className="w-4 h-4 text-blue-accent border-gray-300 rounded focus:ring-blue-accent"
                 />
 
@@ -434,7 +354,7 @@ export const Login: React.FC = () => {
 
             <div className="relative flex justify-center text-sm">
               <span className="px-4 bg-white text-gray-500">
-                Accesos externos
+                Acceso mediante cuenta registrada
               </span>
             </div>
           </div>
@@ -469,7 +389,7 @@ export const Login: React.FC = () => {
               onClick={() => resetFormState(!isLogin)}
               className="text-blue-accent hover:text-blue-hover transition-colors"
             >
-              {isLogin ? 'Crear cuenta de asistente' : 'Iniciar sesión'}
+              {isLogin ? 'Crear cuenta' : 'Iniciar sesión'}
             </button>
           </p>
         </div>
@@ -483,56 +403,57 @@ export const Login: React.FC = () => {
 
         <div className="relative z-10 max-w-md text-white">
           <h2 className="text-4xl mb-6">
-            Acceso por roles para SpeakerZone
+            Gestiona tu experiencia en SpeakerZone
           </h2>
 
           <p className="text-xl text-white/90 mb-8">
-            Cada usuario accede a un panel distinto según el rol guardado en la
-            base de datos.
+            Accede a conferencias, consulta tus reservaciones y conserva tus
+            códigos de acceso en un solo lugar.
           </p>
 
           <div className="space-y-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-5 flex items-start gap-4">
-              <Shield className="w-6 h-6 mt-1" />
+              <CalendarCheck className="w-6 h-6 mt-1" />
 
               <div>
-                <h3 className="text-lg">Administrador</h3>
+                <h3 className="text-lg">Reserva conferencias</h3>
                 <p className="text-white/80 text-sm">
-                  Gestiona eventos, conferencias, speakers y registros.
+                  Explora las sesiones disponibles y aparta tu lugar de forma
+                  sencilla.
                 </p>
               </div>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-5 flex items-start gap-4">
-              <Users className="w-6 h-6 mt-1" />
+              <QrCode className="w-6 h-6 mt-1" />
 
               <div>
-                <h3 className="text-lg">Conferencista</h3>
+                <h3 className="text-lg">Consulta tu acceso</h3>
                 <p className="text-white/80 text-sm">
-                  Consulta sus conferencias y asistentes relacionados.
+                  Visualiza el código de acceso asociado a tus reservaciones.
                 </p>
               </div>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-5 flex items-start gap-4">
-              <UserPlus className="w-6 h-6 mt-1" />
+              <ShieldCheck className="w-6 h-6 mt-1" />
 
               <div>
-                <h3 className="text-lg">Asistente</h3>
+                <h3 className="text-lg">Sesión segura</h3>
                 <p className="text-white/80 text-sm">
-                  Reserva conferencias, consulta su QR y gestiona sus accesos.
+                  Tu cuenta se valida mediante credenciales registradas en el
+                  sistema.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-5">
-            <h3 className="text-lg mb-2">Regla de seguridad</h3>
+            <h3 className="text-lg mb-2">Acceso administrativo</h3>
 
             <p className="text-white/80 text-sm">
-              El registro público solo permite crear cuentas de asistente. Las
-              cuentas de administrador y conferencista deben ser creadas desde
-              administración o precargadas en la base de datos.
+              Las cuentas internas del sistema son administradas directamente
+              desde el panel autorizado.
             </p>
           </div>
         </div>
