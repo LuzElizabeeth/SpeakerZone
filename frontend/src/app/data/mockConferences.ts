@@ -2,7 +2,6 @@ import { Conference } from '../types/conference.types';
 
 /**
  * Datos reales del archivo PROGRAMA.xlsx.
- * Esto queda como respaldo local mientras conectas las pantallas a la API.
  */
 export const mockConferences: Conference[] = [
   {
@@ -11,7 +10,7 @@ export const mockConferences: Conference[] = [
     description: 'Inicio oficial de la Jornada de Ingeniería en Sistemas Computacionales.',
     date: '2026-04-27T09:00:00',
     time: '09:00',
-    location: 'Auditorio / JOMENI',
+    location: 'Auditorio',
     type: 'presencial',
     status: 'próxima',
     speaker: { id: '10000000-0000-0000-0000-000000000001', name: 'Comité Organizador', role: 'Responsable del evento', bio: 'Equipo organizador de la Jornada ISC.', avatarUrl: '', organization: 'Instituto Tecnológico de Cancún' },
@@ -26,7 +25,7 @@ export const mockConferences: Conference[] = [
     description: 'Conferencia impartida por Roger de TrippLite sobre energía en centros de datos.',
     date: '2026-04-28T10:00:00',
     time: '10:00',
-    location: 'JOMENI',
+    location: '',
     type: 'presencial',
     status: 'próxima',
     speaker: { id: '10000000-0000-0000-0000-000000000004', name: 'Roger', role: 'Conferencista', bio: 'Conferencista invitado para temas de data center y redes.', avatarUrl: '', organization: 'TrippLite / Cisco' },
@@ -41,7 +40,7 @@ export const mockConferences: Conference[] = [
     description: 'Conferencia de Gaby de Salto Systems sobre controles de acceso inteligentes.',
     date: '2026-04-28T12:00:00',
     time: '12:00',
-    location: 'JOMENI',
+    location: '',
     type: 'presencial',
     status: 'próxima',
     speaker: { id: '10000000-0000-0000-0000-000000000005', name: 'Gaby', role: 'Conferencista', bio: 'Conferencista invitada de Salto Systems.', avatarUrl: '', organization: 'Salto Systems' },
@@ -56,7 +55,7 @@ export const mockConferences: Conference[] = [
     description: 'Conferencia de Roger de Cisco en Teams sobre introducción a las redes.',
     date: '2026-04-28T17:00:00',
     time: '17:00',
-    location: 'Microsoft Teams / JOMENI',
+    location: 'Microsoft Teams',
     type: 'híbrida',
     status: 'próxima',
     speaker: { id: '10000000-0000-0000-0000-000000000004', name: 'Roger', role: 'Conferencista', bio: 'Conferencista invitado para temas de data center y redes.', avatarUrl: '', organization: 'TrippLite / Cisco' },
@@ -86,7 +85,7 @@ export const mockConferences: Conference[] = [
     description: 'Conferencia impartida por Israel Cupul sobre sistemas *NIX.',
     date: '2026-04-29T12:00:00',
     time: '12:00',
-    location: 'JOMENI',
+    location: '',
     type: 'presencial',
     status: 'próxima',
     speaker: { id: '10000000-0000-0000-0000-000000000010', name: 'Israel Cupul', role: 'Conferencista', bio: 'Conferencista del tema Porque *NIX.', avatarUrl: '', organization: 'Instituto Tecnológico de Cancún' },
@@ -101,7 +100,7 @@ export const mockConferences: Conference[] = [
     description: 'Conferencia de Ciro de Cisco Teams sobre telecomunicaciones modernas.',
     date: '2026-04-30T10:00:00',
     time: '10:00',
-    location: 'Microsoft Teams / JOMENI',
+    location: 'Microsoft Teams',
     type: 'híbrida',
     status: 'próxima',
     speaker: { id: '10000000-0000-0000-0000-000000000011', name: 'Ciro', role: 'Conferencista', bio: 'Conferencista sobre telecomunicaciones modernas.', avatarUrl: '', organization: 'Cisco' },
@@ -116,7 +115,7 @@ export const mockConferences: Conference[] = [
     description: 'Conferencia de Luis Tejeda sobre Kubernetes y Docker.',
     date: '2026-04-30T11:00:00',
     time: '11:00',
-    location: 'JOMENI',
+    location: '',
     type: 'presencial',
     status: 'próxima',
     speaker: { id: '10000000-0000-0000-0000-000000000012', name: 'Luis Tejeda', role: 'Conferencista', bio: 'Conferencista sobre Kubernetes y Docker.', avatarUrl: '', organization: 'Por confirmar' },
