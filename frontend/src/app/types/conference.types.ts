@@ -41,6 +41,65 @@ export interface Conference {
   };
 }
 
+export interface Program {
+  id: string;
+  name: string;
+  slug?: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  imageUrl: string;
+  status: string;
+  registrationOpen?: boolean;
+  featured?: boolean;
+  totalActivities?: number;
+  totalAttendees?: number;
+}
+
+export interface ActivitySpeaker {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  avatarUrl?: string;
+  organization: string;
+}
+
+export interface Activity {
+  id: string;
+  title: string;
+  description: string;
+
+  date: string;
+  time: string;
+  endTime?: string | null;
+
+  location: string;
+
+  activityType: string;
+  modality: string;
+  status: string;
+
+  capacity: number;
+  registeredCount: number;
+
+  requiresRegistration: boolean;
+  registrationType: string;
+  externalRegistrationUrl?: string;
+
+  certificateAvailable: boolean;
+  requirements: string[];
+
+  imageUrl?: string;
+  tags?: string[];
+
+  speaker: ActivitySpeaker;
+  program: Program;
+}
+
+
+
 export interface Speaker {
   id: string;
   name: string;

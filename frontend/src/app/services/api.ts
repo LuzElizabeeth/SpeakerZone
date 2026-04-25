@@ -7,9 +7,12 @@ import {
   Speaker,
   User,
   UserRole,
+  Activity,
+  Program,
 } from '../types/conference.types';
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
+const API_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 export interface SpeakerPayload {
   name: string;
@@ -19,6 +22,11 @@ export interface SpeakerPayload {
   avatarUrl?: string;
 }
 
+/**
+ * LEGACY
+ * Se mantiene temporalmente para compatibilidad con admin viejo
+ * mientras terminamos la migración de conferences → activities
+ */
 export interface ConferencePayload {
   eventId?: string;
   speakerId?: string;
@@ -35,6 +43,10 @@ export interface ConferencePayload {
   status?: string;
 }
 
+/**
+ * LEGACY
+ * También temporal mientras retiramos eventRoutes.js
+ */
 export interface EventFromApi {
   id: string;
   name: string;
@@ -54,13 +66,20 @@ interface AuthResponse {
   user: User;
 }
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
   const token = localStorage.getItem('speakerzone_token');
 
   const response = await fetch(`${API_URL}${path}`, {
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : {}),
       ...(options.headers || {}),
     },
     ...options,
@@ -68,17 +87,29 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   if (!response.ok) {
     const errorBody = await response.json().catch(() => null);
-    throw new Error(errorBody?.error || `Error ${response.status}`);
+
+    throw new Error(
+      errorBody?.error || `Error ${response.status}`
+    );
   }
 
   return response.json();
 }
 
 export const api = {
+  /*
+  |--------------------------------------------------------------------------
+  | AUTH
+  |--------------------------------------------------------------------------
+  */
+
   login: (email: string, password: string) =>
     request<AuthResponse>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        email,
+        password,
+      }),
     }),
 
   register: (
@@ -89,75 +120,202 @@ export const api = {
   ) =>
     request<AuthResponse>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password, role }),
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        role,
+      }),
     }),
 
-  getEvents: () => request<EventFromApi[]>('/events'),
+  /*
+  |--------------------------------------------------------------------------
+  | PROGRAMS (nuevo sistema)
+  |--------------------------------------------------------------------------
+  */
 
-  getEventById: (id: string) => request<EventFromApi>(`/events/${id}`),
+  getPrograms: () =>
+    request<Program[]>('/programs'),
 
-  getConferences: () => request<Conference[]>('/conferences'),
+  getProgramById: (id: string) =>
+    request<Program>(`/programs/${id}`),
 
-  getConferenceById: (id: string) => request<Conference>(`/conferences/${id}`),
+  /*
+  |--------------------------------------------------------------------------
+  | ACTIVITIES (nuevo sistema)
+  |--------------------------------------------------------------------------
+  */
 
-  createConference: (payload: ConferencePayload) =>
-    request<Conference>('/conferences', {
+  getActivitiesByProgram: (programId: string) =>
+    request<Activity[]>(
+      `/programs/${programId}/activities`
+    ),
+
+  getActivityById: (id: string) =>
+    request<Activity>(`/activities/${id}`),
+
+  getCalendarActivities: () =>
+    request<Activity[]>('/activities'),
+
+  registerToActivity: (activityId: string) =>
+    request<Reservation>('/registrations', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        activityId,
+      }),
     }),
 
-  updateConference: (id: string, payload: Partial<ConferencePayload>) =>
-    request<Conference>(`/conferences/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(payload),
-    }),
-
-  deleteConference: (id: string) =>
-    request<{ ok: boolean }>(`/conferences/${id}`, {
-      method: 'DELETE',
-    }),
+  /*
+  |--------------------------------------------------------------------------
+  | SPEAKERS
+  |--------------------------------------------------------------------------
+  */
 
   getSpeakers: () =>
-    request<(Speaker & { totalConferences: number })[]>('/speakers'),
+    request<
+      (Speaker & {
+        totalConferences: number;
+      })[]
+    >('/speakers'),
 
   createSpeaker: (payload: SpeakerPayload) =>
-    request<Speaker & { totalConferences: number }>('/speakers', {
+    request<
+      Speaker & {
+        totalConferences: number;
+      }
+    >('/speakers', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
 
-  updateSpeaker: (id: string, payload: SpeakerPayload) =>
-    request<Speaker & { totalConferences: number }>(`/speakers/${id}`, {
+  updateSpeaker: (
+    id: string,
+    payload: SpeakerPayload
+  ) =>
+    request<
+      Speaker & {
+        totalConferences: number;
+      }
+    >(`/speakers/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     }),
 
   deleteSpeaker: (id: string) =>
-    request<{ ok: boolean }>(`/speakers/${id}`, {
-      method: 'DELETE',
-    }),
+    request<{ ok: boolean }>(
+      `/speakers/${id}`,
+      {
+        method: 'DELETE',
+      }
+    ),
 
-  reserveConference: (conferenceId: string) =>
-    request<Reservation>('/registrations', {
-      method: 'POST',
-      body: JSON.stringify({ conferenceId }),
-    }),
+  /*
+  |--------------------------------------------------------------------------
+  | REGISTRATIONS
+  |--------------------------------------------------------------------------
+  */
 
-  getMyReservations: () => request<Reservation[]>('/registrations/me'),
+  getMyReservations: () =>
+    request<Reservation[]>(
+      '/registrations/me'
+    ),
 
   cancelReservation: (id: string) =>
-    request<{ ok: boolean }>(`/registrations/${id}`, {
-      method: 'DELETE',
-    }),
+    request<{ ok: boolean }>(
+      `/registrations/${id}`,
+      {
+        method: 'DELETE',
+      }
+    ),
 
-  getAllRegistrations: () => request<Reservation[]>('/registrations'),
-
-  getConferenceRegistrations: (conferenceId: string) =>
-    request<Reservation[]>(`/registrations/conference/${conferenceId}`),
+  getAllRegistrations: () =>
+    request<Reservation[]>(
+      '/registrations'
+    ),
 
   checkInByQr: (qrCode: string) =>
-    request<CheckInResponse>('/registrations/check-in', {
-      method: 'POST',
-      body: JSON.stringify({ qrCode }),
-    }),
+    request<CheckInResponse>(
+      '/registrations/check-in',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          qrCode,
+        }),
+      }
+    ),
+
+  /*
+  |--------------------------------------------------------------------------
+  | LEGACY ROUTES
+  | mantener temporalmente
+  |--------------------------------------------------------------------------
+  */
+
+  getEvents: () =>
+    request<EventFromApi[]>('/events'),
+
+  getEventById: (id: string) =>
+    request<EventFromApi>(`/events/${id}`),
+
+  getConferences: () =>
+    request<Conference[]>(
+      '/conferences'
+    ),
+
+  getConferenceById: (id: string) =>
+    request<Conference>(
+      `/conferences/${id}`
+    ),
+
+  createConference: (
+    payload: ConferencePayload
+  ) =>
+    request<Conference>(
+      '/conferences',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  updateConference: (
+    id: string,
+    payload: Partial<ConferencePayload>
+  ) =>
+    request<Conference>(
+      `/conferences/${id}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  deleteConference: (id: string) =>
+    request<{ ok: boolean }>(
+      `/conferences/${id}`,
+      {
+        method: 'DELETE',
+      }
+    ),
+
+  reserveConference: (
+    conferenceId: string
+  ) =>
+    request<Reservation>(
+      '/registrations',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          conferenceId,
+        }),
+      }
+    ),
+
+  getConferenceRegistrations: (
+    conferenceId: string
+  ) =>
+    request<Reservation[]>(
+      `/registrations/conference/${conferenceId}`
+    ),
 };
+

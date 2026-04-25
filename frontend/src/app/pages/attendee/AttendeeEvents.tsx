@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
 import { AppHeader } from '../../components/AppHeader';
-import { mockEvents, Event } from '../../data/mockData';
+import { api } from '../../services/api';
+import { useApi } from '../../hooks/useApi';
 import { 
   Calendar,
   MapPin,
@@ -22,12 +23,24 @@ export const AttendeeEvents: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'todos' | 'próximo' | 'activo' | 'finalizado'>('todos');
 
-  const filteredEvents = mockEvents.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.location.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'todos' || event.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  const loadEvents = () => api.getEvents();
+
+  const {
+    data: events,
+    loading,
+    error
+  } = useApi(loadEvents, []);
+
+  const filteredEvents = events.filter((event) => {
+  const matchesSearch =
+    event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    event.location.toLowerCase().includes(searchQuery.toLowerCase());
+
+  const matchesStatus =
+    filterStatus === 'todos' || event.status === filterStatus;
+
+  return matchesSearch && matchesStatus;
+});
 
   const getStatusBadge = (status: string) => {
     const variants = {

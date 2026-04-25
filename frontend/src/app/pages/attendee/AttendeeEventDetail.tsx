@@ -17,14 +17,18 @@ export const AttendeeEventDetail: React.FC = () => {
   const navigate = useNavigate();
 
   const loadEvent = useCallback(() => {
-    if (!id) {
-      throw new Error('No se recibió el ID del evento');
-    }
+  if (!id) {
+    return Promise.resolve(null);
+  }
 
-    return api.getEventById(id);
-  }, [id]);
+  return api.getEventById(id);
+}, [id]);
 
-  const { data: event, loading, error } = useApi(loadEvent, null);
+const {
+  data: event,
+  loading,
+  error
+} = useApi(loadEvent, null);
 
   return (
     <div className="min-h-screen bg-muted">
@@ -56,6 +60,17 @@ export const AttendeeEventDetail: React.FC = () => {
             </div>
           </div>
         )}
+
+              {!loading && !error && !event && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+          <h2 className="text-lg text-yellow-700 mb-2">
+            Evento no encontrado
+          </h2>
+          <p className="text-yellow-600">
+            No fue posible encontrar la información de este evento.
+          </p>
+        </div>
+      )}
 
         {!loading && !error && event && (
           <section className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -110,7 +125,7 @@ export const AttendeeEventDetail: React.FC = () => {
                 </div>
               </div>
 
-              <Link to="/dashboard">
+              <Link to="/attendee/events">
                 <Button className="bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white">
                   Ver conferencias disponibles
                 </Button>

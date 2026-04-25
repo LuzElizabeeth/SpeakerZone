@@ -3,8 +3,8 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 DROP TABLE IF EXISTS certificates CASCADE;
 DROP TABLE IF EXISTS attendances CASCADE;
 DROP TABLE IF EXISTS registrations CASCADE;
-DROP TABLE IF EXISTS conferences CASCADE;
-DROP TABLE IF EXISTS events CASCADE;
+DROP TABLE IF EXISTS activities CASCADE;
+DROP TABLE IF EXISTS programs CASCADE;
 DROP TABLE IF EXISTS speakers CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
 
@@ -30,34 +30,125 @@ CREATE TABLE speakers (
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE events (
+
+CREATE TABLE programs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   name VARCHAR(180) NOT NULL,
+
+  slug VARCHAR(220) NOT NULL UNIQUE,
+
   description TEXT NOT NULL DEFAULT '',
+
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
+
   location VARCHAR(180) NOT NULL,
+
   image_url TEXT NOT NULL DEFAULT '',
-  status VARCHAR(30) NOT NULL CHECK (status IN ('activo', 'finalizado', 'próximo')) DEFAULT 'próximo',
+
+  status VARCHAR(30) NOT NULL
+    CHECK (
+      status IN (
+        'activo',
+        'finalizado',
+        'próximo'
+      )
+    )
+    DEFAULT 'próximo',
+
+  registration_open BOOLEAN NOT NULL
+    DEFAULT TRUE,
+
+  featured BOOLEAN NOT NULL
+    DEFAULT FALSE,
+
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE conferences (
+CREATE TABLE activities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  speaker_id UUID REFERENCES speakers(id) ON DELETE SET NULL,
+
+  program_id UUID NOT NULL
+    REFERENCES programs(id)
+    ON DELETE CASCADE,
+
+  speaker_id UUID
+    REFERENCES speakers(id)
+    ON DELETE SET NULL,
+
   title VARCHAR(220) NOT NULL,
   description TEXT NOT NULL DEFAULT '',
-  conference_date DATE NOT NULL,
+
+  activity_date DATE NOT NULL,
   start_time TIME NOT NULL,
   end_time TIME,
+
   location VARCHAR(180) NOT NULL,
-  type VARCHAR(30) NOT NULL CHECK (type IN ('presencial', 'virtual', 'híbrida')) DEFAULT 'presencial',
-  status VARCHAR(30) NOT NULL CHECK (status IN ('próxima', 'en-curso', 'finalizada', 'cancelada')) DEFAULT 'próxima',
-  capacity INT NOT NULL DEFAULT 100 CHECK (capacity >= 0),
+
+  activity_type VARCHAR(40) NOT NULL
+    CHECK (
+      activity_type IN (
+        'conferencia',
+        'Taller',
+        'Evento',
+        'Evento_especial'
+      )
+    )
+    DEFAULT 'conferencia',
+
+  modality VARCHAR(30) NOT NULL
+    CHECK (
+      modality IN (
+        'presencial',
+        'virtual',
+        'híbrida'
+      )
+    )
+    DEFAULT 'presencial',
+
+  status VARCHAR(30) NOT NULL
+    CHECK (
+      status IN (
+        'próxima',
+        'en-curso',
+        'finalizada',
+        'cancelada'
+      )
+    )
+    DEFAULT 'próxima',
+
+  capacity INT NOT NULL
+    DEFAULT 100
+    CHECK (capacity >= 0),
+
+  requires_registration BOOLEAN NOT NULL
+    DEFAULT TRUE,
+
+  registration_type VARCHAR(40) NOT NULL
+    CHECK (
+      registration_type IN (
+        'internal_form',
+        'external_link',
+        'none'
+      )
+    )
+    DEFAULT 'internal_form',
+
+  external_registration_url TEXT NOT NULL
+    DEFAULT '',
+
+  certificate_available BOOLEAN NOT NULL
+    DEFAULT FALSE,
+
+  requirements TEXT[] NOT NULL
+    DEFAULT '{}',
+
   image_url TEXT NOT NULL DEFAULT '',
+
   tags TEXT[] NOT NULL DEFAULT '{}',
+
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
@@ -65,11 +156,11 @@ CREATE TABLE conferences (
 CREATE TABLE registrations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   attendee_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
-  conference_id UUID NOT NULL REFERENCES conferences(id) ON DELETE CASCADE,
+  activity_id UUID NOT NULL REFERENCES activities(id) ON DELETE CASCADE,
   registered_at TIMESTAMP NOT NULL DEFAULT NOW(),
   status VARCHAR(30) NOT NULL CHECK (status IN ('confirmada', 'pendiente', 'cancelada')) DEFAULT 'confirmada',
   qr_code TEXT NOT NULL UNIQUE,
-  UNIQUE (attendee_id, conference_id)
+  UNIQUE (attendee_id, activity_id)
 );
 
 CREATE TABLE attendances (
@@ -92,8 +183,8 @@ CREATE TABLE certificates (
   CHECK (registration_id IS NOT NULL OR speaker_id IS NOT NULL)
 );
 
-CREATE INDEX idx_conferences_event_id ON conferences(event_id);
-CREATE INDEX idx_conferences_speaker_id ON conferences(speaker_id);
-CREATE INDEX idx_conferences_date ON conferences(conference_date, start_time);
+CREATE INDEX idx_activities_program_id ON activities(program_id);
+CREATE INDEX idx_activities_speaker_id ON activities(speaker_id);
+CREATE INDEX idx_activities_date ON activities(activity_date, start_time);
 CREATE INDEX idx_registrations_attendee_id ON registrations(attendee_id);
-CREATE INDEX idx_registrations_conference_id ON registrations(conference_id);
+CREATE INDEX idx_registrations_activity_id ON registrations(activity_id);

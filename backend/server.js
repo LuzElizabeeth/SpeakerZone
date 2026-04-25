@@ -4,10 +4,11 @@ import dotenv from "dotenv";
 import pkg from "pg";
 
 import authRoutes from "./authRoutes.js";
-import conferenceRoutes from "./routes/conferenceRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import speakerRoutes from "./routes/speakerRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
+import programRoutes from "./routes/programRoutes.js";
 
 dotenv.config();
 
@@ -27,10 +28,14 @@ const pool = new Pool(
         user: process.env.DB_USER || "postgres",
         host: process.env.DB_HOST || "localhost",
         database: process.env.DB_NAME || "speakerzone_tecnm",
-        password: process.env.DB_PASS || "",
+        password: process.env.DB_PASSWORD,
         port: Number(process.env.DB_PORT || 5432),
       }
 );
+
+if (!process.env.DB_PASSWORD) {
+  throw new Error("DB_PASSWORD no está definido");
+}
 
 const app = express();
 
@@ -44,8 +49,9 @@ app.use(
 app.use(express.json());
 
 app.use("/api/auth", authRoutes(pool));
-app.use("/api/conferences", conferenceRoutes(pool));
+app.use("/api/activities", activityRoutes(pool));
 app.use("/api/events", eventRoutes(pool));
+app.use("/api/programs", programRoutes(pool));
 app.use("/api/speakers", speakerRoutes(pool));
 app.use("/api/registrations", registrationRoutes(pool));
 

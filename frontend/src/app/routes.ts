@@ -38,6 +38,11 @@ import AttendeeHistory from './pages/attendee/AttendeeHistory';
 import AttendeeDashboard from './pages/attendee/AttendeeDashboard';
 import AttendeeReservations from './pages/attendee/AttendeeReservations';
 import AttendeeEventDetail from './pages/attendee/AttendeeEventDetail';
+import AttendeeProgramList from './pages/attendee/AttendeeProgramList';
+import AttendeeProgramDetail from './pages/attendee/AttendeeProgramDetail';
+import AttendeeActivityDetail from './pages/attendee/AttendeeActivityDetail';
+import AttendeeProgramCalendar from './pages/attendee/AttendeeProgramCalendar';
+import AttendeeRegistrationFlow from './pages/attendee/AttendeeRegistrationFlow';
 
 const withAuth = (
   Component: React.ComponentType,
@@ -167,6 +172,27 @@ export const router = createBrowserRouter([
     path: '/attendee/history',
     Component: withAuth(AttendeeHistory, ['attendee']),
   },
+
+  {
+  path: '/attendee/programs',
+  Component: withAuth(AttendeeProgramList, ['attendee']),
+},
+{
+  path: '/attendee/programs/:id',
+  Component: withAuth(AttendeeProgramDetail, ['attendee']),
+},
+{
+  path: '/attendee/activities/:id',
+  Component: withAuth(AttendeeActivityDetail, ['attendee']),
+},
+{
+  path: '/attendee/calendar',
+  Component: withAuth(AttendeeProgramCalendar, ['attendee']),
+},
+{
+  path: '/attendee/register/:id',
+  Component: withAuth(AttendeeRegistrationFlow, ['attendee']),
+},
 
   {
     path: '*',
