@@ -124,14 +124,15 @@ export const Dashboard: React.FC = () => {
               </label>
 
               <select
-                id="conference-type-filter"
+                aria-label="Filtrar conferencias por modalidad"
+                title="Filtrar conferencias por modalidad"
                 value={selectedType}
                 onChange={(e) =>
                   setSelectedType(e.target.value as ConferenceType | 'todas')
                 }
                 className="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all bg-white"
               >
-                              <option value="todas">Todas las modalidades</option>
+                <option value="todas">Todas las modalidades</option>
                 <option value="presencial">Presencial</option>
                 <option value="virtual">Virtual</option>
                 <option value="híbrida">Híbrida</option>
