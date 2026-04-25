@@ -1,50 +1,92 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router';
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { AppHeader } from '../../components/AppHeader';
-import { mockEvents, Event } from '../../data/mockData';
-import { 
-  Calendar,
-  MapPin,
-  Users,
-  Search,
-  Filter,
-  ArrowRight,
-  CheckCircle,
-  Clock
-} from 'lucide-react';
+import { ConferenceCard } from '../../components/ConferenceCard';
+import { SuccessModal } from '../../components/SuccessModal';
+import { api } from '../../services/api';
+import { useApi } from '../../hooks/useApi';
+import { Conference, ConferenceType } from '../../types/conference.types';
+import { Search, Filter, AlertCircle, Calendar } from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Badge } from '../../components/ui/badge';
-import { Button } from '../../components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
 
 export const AttendeeEvents: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'todos' | 'próximo' | 'activo' | 'finalizado'>('todos');
+  const navigate = useNavigate();
 
-  const filteredEvents = mockEvents.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.location.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'todos' || event.status === filterStatus;
-    return matchesSearch && matchesStatus;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<ConferenceType | 'todas'>(
+    'todas'
+  );
+  const [reservationError, setReservationError] = useState<string | null>(null);
+  const [registeringConferenceId, setRegisteringConferenceId] = useState<
+    string | null
+  >(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [registeredConferenceTitle, setRegisteredConferenceTitle] = useState('');
+  const [registeredQrCode, setRegisteredQrCode] = useState('');
+
+  const loadConferences = useCallback(() => api.getConferences(), []);
+
+  const {
+    data: conferences,
+    loading,
+    error,
+    refetch,
+  } = useApi<Conference[]>(loadConferences, []);
+
+  const availableConferences = conferences.filter(
+    (conference) =>
+      conference.status !== 'cancelada' && conference.status !== 'finalizada'
+  );
+
+  const filteredConferences = availableConferences.filter((conference) => {
+    const normalizedSearch = searchQuery.toLowerCase();
+
+    const matchesSearch =
+      conference.title.toLowerCase().includes(normalizedSearch) ||
+      conference.description.toLowerCase().includes(normalizedSearch) ||
+      conference.location.toLowerCase().includes(normalizedSearch) ||
+      conference.speaker.name.toLowerCase().includes(normalizedSearch);
+
+    const matchesType =
+      filterType === 'todas' || conference.type === filterType;
+
+    return matchesSearch && matchesType;
   });
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      'próximo': { icon: Clock, color: 'bg-blue-100 text-blue-700' },
-      'activo': { icon: CheckCircle, color: 'bg-green-100 text-green-700' },
-      'finalizado': { icon: CheckCircle, color: 'bg-gray-100 text-gray-700' }
-    };
+  const handleReserveConference = async (conferenceId: string) => {
+    setReservationError(null);
 
-    const variant = variants[status as keyof typeof variants] || variants['próximo'];
-    const Icon = variant.icon;
+    try {
+      setRegisteringConferenceId(conferenceId);
 
-    return (
-      <Badge className={variant.color}>
-        <Icon className="w-3 h-3 mr-1" />
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
+      const reservation = await api.reserveConference(conferenceId);
+
+      setRegisteredConferenceTitle(reservation.conference.title);
+      setRegisteredQrCode(reservation.qrCode);
+      setShowSuccessModal(true);
+
+      await refetch();
+    } catch (err) {
+      setReservationError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo completar la reservación.'
+      );
+    } finally {
+      setRegisteringConferenceId(null);
+    }
+  };
+
+  const handleViewDetails = (conferenceId: string) => {
+    navigate(`/conference/${conferenceId}`);
   };
 
   return (
@@ -52,24 +94,25 @@ export const AttendeeEvents: React.FC = () => {
       <AppHeader />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl lg:text-4xl mb-2 text-gray-900">
-            Eventos Disponibles
+            Conferencias Disponibles
           </h1>
+
           <p className="text-lg text-gray-600">
-            Descubre y regístrate en los eventos de tecnología
+            Explora las conferencias disponibles y reserva tu plaza como
+            asistente.
           </p>
         </div>
 
-        {/* Filters */}
         <Card className="p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+
               <Input
                 type="text"
-                placeholder="Buscar eventos por nombre o ubicación..."
+                placeholder="Buscar por título, ubicación o conferencista..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -78,15 +121,25 @@ export const AttendeeEvents: React.FC = () => {
 
             <div className="flex items-center gap-2">
               <Filter className="w-5 h-5 text-gray-400" />
-              <Select value={filterStatus} onValueChange={(value) => setFilterStatus(value as any)}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Estado" />
+
+              <Select
+                value={filterType}
+                onValueChange={(value) =>
+                  setFilterType(value as ConferenceType | 'todas')
+                }
+              >
+                <SelectTrigger
+                  className="w-[220px]"
+                  aria-label="Filtrar por modalidad"
+                >
+                  <SelectValue placeholder="Modalidad" />
                 </SelectTrigger>
+
                 <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="próximo">Próximos</SelectItem>
-                  <SelectItem value="activo">Activos</SelectItem>
-                  <SelectItem value="finalizado">Finalizados</SelectItem>
+                  <SelectItem value="todas">Todas las modalidades</SelectItem>
+                  <SelectItem value="presencial">Presencial</SelectItem>
+                  <SelectItem value="virtual">Virtual</SelectItem>
+                  <SelectItem value="híbrida">Híbrida</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -94,77 +147,92 @@ export const AttendeeEvents: React.FC = () => {
 
           <div className="mt-4 pt-4 border-t border-gray-100">
             <p className="text-sm text-gray-600">
-              {filteredEvents.length} eventos encontrados
+              {filteredConferences.length}{' '}
+              {filteredConferences.length === 1
+                ? 'conferencia encontrada'
+                : 'conferencias encontradas'}
             </p>
           </div>
         </Card>
 
-        {/* Events Grid */}
-        {filteredEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEvents.map((event) => (
-              <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <img
-                  src={event.imageUrl}
-                  alt={event.name}
-                  className="w-full h-48 object-cover"
-                />
-                
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xl text-gray-900">{event.name}</h3>
-                    {getStatusBadge(event.status)}
-                  </div>
+        {reservationError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 mt-0.5" />
 
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {event.description}
-                  </p>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Calendar className="w-4 h-4" />
-                      <span>
-                        {new Date(event.startDate).toLocaleDateString('es-ES', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <MapPin className="w-4 h-4" />
-                      <span className="truncate">{event.location}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Users className="w-4 h-4" />
-                      <span>{event.totalAttendees} asistentes registrados</span>
-                    </div>
-                  </div>
-
-                  <Link to={`/attendee/event/${event.id}`}>
-                    <Button className="w-full bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white">
-                      Ver Detalles
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
-            ))}
+            <div>
+              <h2 className="text-lg mb-1">No se pudo reservar</h2>
+              <p>{reservationError}</p>
+            </div>
           </div>
-        ) : (
+        )}
+
+        {registeringConferenceId && (
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-xl p-4 mb-6">
+            Procesando reservación...
+          </div>
+        )}
+
+        {loading && (
           <Card className="p-12 text-center">
             <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+
             <h3 className="text-xl mb-2 text-gray-900">
-              No se encontraron eventos
+              Cargando conferencias
             </h3>
+
             <p className="text-gray-600">
-              Intenta ajustar tus filtros de búsqueda
+              Consultando datos reales desde la API...
+            </p>
+          </Card>
+        )}
+
+        {!loading && error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 mt-0.5" />
+
+            <div>
+              <h2 className="text-lg mb-1">
+                No se pudieron cargar las conferencias
+              </h2>
+              <p>{error}</p>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && filteredConferences.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredConferences.map((conference) => (
+              <ConferenceCard
+                key={conference.id}
+                conference={conference}
+                onRegister={handleReserveConference}
+                onViewDetails={handleViewDetails}
+              />
+            ))}
+          </div>
+        )}
+
+        {!loading && !error && filteredConferences.length === 0 && (
+          <Card className="p-12 text-center">
+            <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+
+            <h3 className="text-xl mb-2 text-gray-900">
+              No se encontraron conferencias
+            </h3>
+
+            <p className="text-gray-600">
+              Intenta ajustar la búsqueda o cambiar el filtro de modalidad.
             </p>
           </Card>
         )}
       </main>
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="¡Reservación confirmada!"
+        message={`Tu plaza para "${registeredConferenceTitle}" fue reservada correctamente. Código QR: ${registeredQrCode}`}
+      />
     </div>
   );
 };
