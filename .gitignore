@@ -3,7 +3,11 @@ node_modules/
 out/
 dist/
 build/
+
 .env
 .env.*
+!.env.example
+!**/.env.example
+
 .vscode/
 .DS_Store
