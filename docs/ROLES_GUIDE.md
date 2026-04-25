@@ -5,8 +5,8 @@ Esta guía te ayudará a probar las diferentes vistas y funcionalidades según e
 ## 🚀 Cómo Probar los Diferentes Roles
 
 ### 1. 📝 **Asistente** (Attendee)
-**Email de prueba:** `usuario@email.com`
-**Password:** cualquiera
+**Email de prueba:** `asistente@speakerzone.com`
+**Password:** 123456
 
 #### Acceso a:
 - ✅ Landing page (`/`)
@@ -24,8 +24,8 @@ Conferencias → Mis Reservas → Conferencistas → Acerca de
 ---
 
 ### 2. 🎤 **Conferencista** (Speaker)
-**Email de prueba:** `speaker@email.com`
-**Password:** cualquiera
+**Email de prueba:** `speaker@speakerzone.com`
+**Password:** 123456
 
 #### Acceso a:
 - ✅ Panel del conferencista (`/speaker/dashboard`)
@@ -71,8 +71,8 @@ Mi Panel → Mis Conferencias → Asistentes → Certificados → Mi Perfil
 ---
 
 ### 3. 👨‍💼 **Administrador** (Admin)
-**Email de prueba:** `admin@email.com`
-**Password:** cualquiera
+**Email de prueba:** `admin@speakerzone.com`
+**Password:** 123456
 
 #### Acceso a:
 - ✅ Panel de administración (`/admin/dashboard`)
@@ -164,10 +164,10 @@ En la página de login, verás 3 botones para seleccionar rol:
 
 ### Paso 3: Ingresar credenciales
 - **Email:** Usa el formato según el rol deseado
-  - `usuario@email.com` → Asistente
-  - `speaker@email.com` → Speaker
-  - `admin@email.com` → Admin
-- **Password:** Cualquier valor (es una demo)
+  - `asistente@speakerzone.com` → Asistente
+  - `speaker@speakerzone.com` → Speaker
+  - `admin@speakerzone.com` → Admin
+- **Password:** 123456
 
 ### Paso 4: Explorar el panel
 Después del login, serás redirigido automáticamente al panel correspondiente:
