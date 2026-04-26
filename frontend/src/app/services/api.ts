@@ -69,8 +69,8 @@ export interface EventFromApi {
 
 interface AuthResponse {
   message: string;
-  token?: string;
-  user?: User;
+  token: string | null;
+  user: User | null;
   requiresEmailVerification?: boolean;
 }
 
@@ -175,11 +175,21 @@ const normalizeReservation = (reservation: Reservation): Reservation => {
 export const api = {
   getCurrentUser: () => request<User>('/auth/me'),
 
-  login: (email: string, password: string) =>
-    request<AuthResponse>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    }),
+ login: async (email: string, password: string) => {
+  const response = await request<AuthResponse>('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!response.user || !response.token) {
+    throw new Error('Respuesta inválida del servidor al iniciar sesión.');
+  }
+
+  return {
+    user: response.user,
+    token: response.token,
+  };
+},
 
   register: (
     name: string,

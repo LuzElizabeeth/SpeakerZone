@@ -458,12 +458,12 @@ const authRoutes = (pool) => {
         });
       }
 
-      if (!user.email_verified) {
+    /*   if (!user.email_verified) {
         return res.status(403).json({
           error:
             "Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.",
         });
-      }
+      } */
 
       const validPassword = await bcrypt.compare(password, user.password);
 
