@@ -296,13 +296,7 @@ export const AttendeeProgramCalendar: React.FC = () => {
             {!loading &&
               !error &&
               activityDays.length > 0 && (
-                <div
-                  className="grid gap-4"
-                  style={{
-                    gridTemplateColumns:
-                      'repeat(auto-fit, minmax(260px, 1fr))',
-                  }}
-                >
+                <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
                   {groupedActivities.map(
                     ({ day, activities }) => (
                       <div

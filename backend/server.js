@@ -5,17 +5,15 @@ import pkg from "pg";
 
 import authRoutes from "./authRoutes.js";
 import activityRoutes from "./routes/activityRoutes.js";
-import eventRoutes from "./routes/eventRoutes.js";
+import programRoutes from "./routes/programRoutes.js";
 import speakerRoutes from "./routes/speakerRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
-import programRoutes from "./routes/programRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 
 const { Pool } = pkg;
 
-// ✅ Detecta si existe DATABASE_URL
 const useDatabaseUrl = Boolean(process.env.DATABASE_URL);
 const dbPassword = process.env.DB_PASSWORD || process.env.DB_PASS;
 const dbSsl = process.env.DB_SSL === "true";
@@ -68,13 +66,11 @@ app.use(
 
 app.use(express.json());
 
-// ✅ Rutas
 app.use("/api/auth", authRoutes(pool));
-app.use("/api/activities", activityRoutes(pool));
-app.use("/api/events", eventRoutes(pool));
 app.use("/api/programs", programRoutes(pool));
-app.use("/api/speakers", speakerRoutes(pool));
+app.use("/api/activities", activityRoutes(pool));
 app.use("/api/registrations", registrationRoutes(pool));
+app.use("/api/speakers", speakerRoutes(pool));
 app.use("/api/users", userRoutes(pool));
 
 app.get("/", (_req, res) => {
@@ -84,13 +80,17 @@ app.get("/", (_req, res) => {
 app.get("/api/db-check", async (_req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
+
     res.json({
       status: "Conectado a PostgreSQL 🚀",
       time: result.rows[0].now,
     });
   } catch (error) {
     console.error("Error al conectar con PostgreSQL:", error);
-    res.status(500).json({ error: "Error al conectar con la base de datos" });
+
+    res.status(500).json({
+      error: "Error al conectar con la base de datos",
+    });
   }
 });
 

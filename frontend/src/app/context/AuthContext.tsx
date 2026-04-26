@@ -43,7 +43,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // 🔒 Parse seguro
 const safeParseUser = (value: string | null): User | null => {
-  if (!value || value === "undefined") return null;
+  if (!value || value === 'undefined') return null;
 
   try {
     return JSON.parse(value) as User;
@@ -101,7 +101,6 @@ export const useAuth = () => {
   return context;
 };
 
-// 🚀 PROVIDER FINAL
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const initialSession = getStoredSession();
 
