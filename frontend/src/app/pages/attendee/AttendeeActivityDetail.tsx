@@ -25,6 +25,9 @@ export const AttendeeActivityDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [showSuccessModal, setShowSuccessModal] = React.useState(false);
+
   const loadActivity = useCallback(() => {
     if (!id) {
       throw new Error('No se recibió el ID de la actividad');
@@ -65,56 +68,53 @@ export const AttendeeActivityDetail: React.FC = () => {
     if (!activity) return null;
 
     if (!activity.requiresRegistration) {
-  return (
-    <div className="space-y-4">
-      <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+      return (
+        <div className="space-y-4">
+          <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
 
-          <div>
-            <p className="text-sm font-medium text-blue-700">
-              Esta actividad no requiere registro previo
-            </p>
+              <div>
+                <p className="text-sm font-medium text-blue-700">
+                  Esta actividad no requiere registro previo
+                </p>
 
-            <p className="text-sm text-blue-600 mt-1">
-              Puedes asistir libremente, pero puedes confirmar tu
-              asistencia para que quede registrada en tu historial,
-              reservas y certificados.
-            </p>
+                <p className="text-sm text-blue-600 mt-1">
+                  Puedes asistir libremente, pero puedes confirmar tu
+                  asistencia para que quede registrada en tu historial,
+                  reservas y certificados.
+                </p>
+              </div>
+            </div>
           </div>
+
+          <Button
+            disabled={isSubmitting}
+            className="w-full bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white"
+            onClick={async () => {
+              try {
+                setIsSubmitting(true);
+
+                await api.registerToActivity(activity.id);
+
+                setShowSuccessModal(true);
+              } catch (error) {
+                console.error(
+                  'Error al confirmar asistencia:',
+                  error
+                );
+              } finally {
+                setIsSubmitting(false);
+              }
+            }}
+          >
+            {isSubmitting
+              ? 'Confirmando asistencia...'
+              : 'Confirmar mi asistencia'}
+          </Button>
         </div>
-      </div>
-
-      <Button
-        className="w-full bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white"
-        onClick={async () => {
-  try {
-    await api.registerToActivity(activity.id);
-
-    const goToReservations = window.confirm(
-      'Asistencia confirmada exitosamente.\n\nTu actividad fue agregada a tus reservas.\n\n¿Deseas ir a ver tus reservas ahora?'
-    );
-
-    if (goToReservations) {
-      navigate('/attendee/reservations');
+      );
     }
-  } catch (error) {
-    console.error(
-      'Error al confirmar asistencia:',
-      error
-    );
-
-    window.alert(
-      'No se pudo confirmar la asistencia. Intenta nuevamente.'
-    );
-  }
-}}
-      >
-        Confirmar mi asistencia
-      </Button>
-    </div>
-  );
-}
 
     if (activity.registeredCount >= activity.capacity) {
       return (
@@ -386,10 +386,46 @@ export const AttendeeActivityDetail: React.FC = () => {
             </div>
           </div>
         )}
+
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
+              <h2 className="text-2xl text-gray-900 mb-3">
+                Asistencia confirmada 🎉
+              </h2>
+
+              <p className="text-gray-600 mb-6">
+                Tu actividad fue agregada correctamente a tus
+                reservas y podrá utilizarse para check-in y
+                certificados.
+              </p>
+
+              <div className="space-y-3">
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white"
+                  onClick={() =>
+                    navigate('/attendee/reservations')
+                  }
+                >
+                  Ver mis reservas
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() =>
+                    setShowSuccessModal(false)
+                  }
+                >
+                  Cerrar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
 };
 
 export default AttendeeActivityDetail;
-

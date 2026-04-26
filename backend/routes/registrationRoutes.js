@@ -200,7 +200,9 @@ const registrationRoutes = (pool) => {
             error: "No hay cupos disponibles",
           });
         }
-
+        console.log("USER:", req.user);
+        console.log("ATTENDEE ID:", attendeeId);
+        console.log("ACTIVITY ID:", finalActivityId);
         const existingRegistration = await pool.query(
           `
           SELECT id
@@ -220,23 +222,62 @@ const registrationRoutes = (pool) => {
 
         const qrCode = crypto.randomUUID();
 
-        const result = await pool.query(
-          `
-          INSERT INTO registrations (
-            attendee_id,
-            activity_id,
-            status,
-            qr_code
-          )
-          VALUES ($1, $2, 'confirmada', $3)
-          RETURNING id;
-          `,
-          [attendeeId, finalActivityId, qrCode]
-        );
+const canceledRegistration = await pool.query(
+  `
+  SELECT id
+  FROM registrations
+  WHERE attendee_id = $1
+    AND activity_id = $2
+    AND status = 'cancelada'
+  LIMIT 1;
+  `,
+  [attendeeId, finalActivityId]
+);
 
-        const registration = await selectRegistrationById(pool, result.rows[0].id);
+if (canceledRegistration.rows.length > 0) {
+  await pool.query(
+    `
+    UPDATE registrations
+    SET
+      status = 'confirmada',
+      qr_code = $2,
+      registered_at = NOW()
+    WHERE id = $1;
+    `,
+    [
+      canceledRegistration.rows[0].id,
+      crypto.randomUUID(),
+    ]
+  );
 
-        res.status(201).json(registration);
+  const registration = await selectRegistrationById(
+    pool,
+    canceledRegistration.rows[0].id
+  );
+
+  return res.status(200).json(registration);
+}
+
+const result = await pool.query(
+  `
+  INSERT INTO registrations (
+    attendee_id,
+    activity_id,
+    status,
+    qr_code
+  )
+  VALUES ($1, $2, 'confirmada', $3)
+  RETURNING id;
+  `,
+  [attendeeId, finalActivityId, qrCode]
+);
+
+const registration = await selectRegistrationById(
+  pool,
+  result.rows[0].id
+);
+
+res.status(201).json(registration);
       } catch (error) {
         console.error("Error al registrar actividad:", error);
 

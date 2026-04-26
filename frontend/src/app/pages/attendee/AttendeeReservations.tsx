@@ -79,8 +79,12 @@ export const AttendeeReservations: React.FC = () => {
     string | null
   >(null);
 
-  const sortedReservations = useMemo(() => {
-  return [...reservations].sort((a, b) => {
+ const activeReservations = reservations.filter(
+  (reservation) => reservation.status !== 'cancelada'
+);
+
+const sortedReservations = useMemo(() => {
+  return [...activeReservations].sort((a, b) => {
     const itemA = a.conference || a.activity;
     const itemB = b.conference || b.activity;
 
@@ -94,11 +98,7 @@ export const AttendeeReservations: React.FC = () => {
 
     return dateA - dateB;
   });
-}, [reservations]);
-
-  const activeReservations = reservations.filter(
-    (reservation) => reservation.status !== 'cancelada'
-  );
+}, [activeReservations]);
 
   const stats = useMemo(() => {
     return {
