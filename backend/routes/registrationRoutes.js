@@ -55,11 +55,8 @@ const registrationRoutes = (pool) => {
 
         const activity = activityResult.rows[0];
 
-        if (!activity.requires_registration) {
-          return res.status(400).json({
-            error: "Esta actividad no requiere registro",
-          });
-        }
+        // Si no requiere registro, igual permitimos
+        // confirmar asistencia para historial, QR y certificados
 
         if (
           Number(activity.registered_count) >=

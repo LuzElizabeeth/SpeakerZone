@@ -121,6 +121,7 @@ export const api = {
   // PROGRAMS
   getPrograms: () => request<Program[]>('/programs'),
   getProgramById: (id: string) => request<Program>(`/programs/${id}`),
+  
 
   // ACTIVITIES
   getActivitiesByProgram: (programId: string) =>

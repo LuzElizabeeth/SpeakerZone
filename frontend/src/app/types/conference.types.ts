@@ -2,7 +2,6 @@
  * Rol del usuario en el sistema
  */
 export type UserRole = 'admin' | 'speaker' | 'attendee';
-
 /**
  * Usuario del sistema
  */
@@ -130,15 +129,16 @@ export interface Registration {
   qrCode: string;
 }
 
-export interface Reservation extends Registration {
+export interface Reservation {
+  id: string;
+  status: RegistrationStatus;
+  qrCode: string;
+  registeredAt: string;
   checkedIn: boolean;
-  checkedInAt: string | null;
-  attendee: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  conference: Conference;
+  checkedInAt?: string;
+
+  conference?: Conference;
+  activity?: Activity;
 }
 
 export interface CheckInResponse {

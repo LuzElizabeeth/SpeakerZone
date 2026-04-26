@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { Link } from 'react-router';
 import {
   Calendar,
   ChevronLeft,
@@ -321,10 +322,11 @@ export const AttendeeProgramCalendar: React.FC = () => {
                         <div className="space-y-4">
                           {activities.map(
                             (activity: any) => (
-                              <div
+                                <Link
                                 key={activity.id}
-                                className="rounded-2xl border bg-white p-4 shadow-sm"
-                              >
+                                to={`/attendee/activities/${activity.id}`}
+                                className="block rounded-2xl border bg-white p-4 shadow-sm hover:shadow-md hover:border-blue-200 transition-all"
+                                >
                                 <h3 className="font-medium text-sm text-gray-900 mb-3">
                                   {activity.title}
                                 </h3>
@@ -351,7 +353,7 @@ export const AttendeeProgramCalendar: React.FC = () => {
                                 <Badge>
                                   {activity.activityType}
                                 </Badge>
-                              </div>
+                                </Link>
                             )
                           )}
                         </div>

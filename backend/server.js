@@ -28,15 +28,11 @@ const pool = new Pool(
   useDatabaseUrl
     ? {
         connectionString: process.env.DATABASE_URL,
-<<<<<<< Updated upstream
-        ssl: { rejectUnauthorized: false }, // Render requiere SSL
-=======
         ssl: dbSsl
           ? {
               rejectUnauthorized: false,
             }
           : false,
->>>>>>> Stashed changes
       }
     : {
         user: process.env.DB_USER || "postgres",
@@ -52,14 +48,11 @@ const pool = new Pool(
       }
 );
 
-<<<<<<< Updated upstream
 // ✅ Solo valida DB_PASSWORD si no usas DATABASE_URL
 if (!useDatabaseUrl && !process.env.DB_PASSWORD) {
   throw new Error("DB_PASSWORD no está definido");
 }
 
-=======
->>>>>>> Stashed changes
 const app = express();
 
 app.use(
