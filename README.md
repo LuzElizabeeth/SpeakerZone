@@ -96,9 +96,36 @@ Crear un archivo `.env` en la carpeta `backend` con:
 DB_USER=tu_usuario
 DB_HOST=localhost
 DB_NAME=tu_base
-DB_PASS=tu_password
+DB_PASSWORD=tu_password
 DB_PORT=5432
+JWT_SECRET=una_clave_segura
+PORT=5001
+
+# Correo de verificación (obligatorio para registro)
+EMAIL_USER=tu_correo_speakerzone@gmail.com
+EMAIL_PASS=tu_app_password_gmail
+FRONTEND_URL=http://localhost:5173
+BASE_URL=http://localhost:5001
 ```
+
+Para producción (Render/Vercel/Netlify), configurar además:
+
+```
+DATABASE_URL=postgresql://...
+FRONTEND_URL=https://tu-frontend.com
+BASE_URL=https://tu-backend.com
+```
+
+> Nota: `DB_PASS` también es aceptado por compatibilidad, pero el valor recomendado es `DB_PASSWORD`.
+
+---
+
+## ✅ Flujo de verificación de correo
+
+1. El usuario se registra.
+2. El backend envía un correo desde la cuenta de SpeakerZone.
+3. El usuario abre el enlace de verificación.
+4. Solo después de verificar el correo puede iniciar sesión.
 
 ---
 

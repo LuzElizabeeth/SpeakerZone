@@ -17,11 +17,12 @@ import {
   Program,
 } from '../types/conference.types';
 
-const isLocal = window.location.hostname === 'localhost';
-
+// 🔥 DETECCIÓN AUTOMÁTICA DE ENTORNO
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  (isLocal ? 'http://localhost:5001/api' : '/api');
+  (import.meta.env.DEV
+    ? 'http://localhost:5001/api'
+    : 'https://speakerzone-backend.onrender.com/api');
 
 export const AUTH_TOKEN_KEY = 'speakerzone_token';
 
@@ -68,8 +69,9 @@ export interface EventFromApi {
 
 interface AuthResponse {
   message: string;
-  token: string;
-  user: User;
+  token?: string;
+  user?: User;
+  requiresEmailVerification?: boolean;
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -188,6 +190,21 @@ export const api = {
     request<AuthResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ name, email, password, role }),
+    }),
+
+  resendVerificationEmail: (email: string) =>
+    request<{ message: string; retryAfterSeconds?: number }>(
+      '/auth/resend-verification',
+      {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      }
+    ),
+
+  verifyEmailToken: (token: string) =>
+    request<{ message: string }>('/auth/verify-email-token', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
     }),
 
   // PROGRAMS
