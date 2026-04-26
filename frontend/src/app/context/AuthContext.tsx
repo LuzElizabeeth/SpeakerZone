@@ -41,7 +41,6 @@ interface StoredSession {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 🔒 Parse seguro del usuario guardado
 const safeParseUser = (value: string | null): User | null => {
   if (!value || value === 'undefined') return null;
 
@@ -52,34 +51,24 @@ const safeParseUser = (value: string | null): User | null => {
   }
 };
 
-// 🔍 Detectar sesión guardada en localStorage o sessionStorage
 const getStoredSession = (): StoredSession | null => {
   const localToken = localStorage.getItem(AUTH_TOKEN_KEY);
   const localUser = safeParseUser(localStorage.getItem(AUTH_USER_KEY));
 
   if (localToken && localUser) {
-    return {
-      token: localToken,
-      user: localUser,
-      storageType: 'local',
-    };
+    return { token: localToken, user: localUser, storageType: 'local' };
   }
 
   const sessionToken = sessionStorage.getItem(AUTH_TOKEN_KEY);
   const sessionUser = safeParseUser(sessionStorage.getItem(AUTH_USER_KEY));
 
   if (sessionToken && sessionUser) {
-    return {
-      token: sessionToken,
-      user: sessionUser,
-      storageType: 'session',
-    };
+    return { token: sessionToken, user: sessionUser, storageType: 'session' };
   }
 
   return null;
 };
 
-// 🧹 Limpiar sesión de ambos almacenamientos
 const clearStoredSession = () => {
   localStorage.removeItem(AUTH_USER_KEY);
   localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -87,7 +76,6 @@ const clearStoredSession = () => {
   sessionStorage.removeItem(AUTH_TOKEN_KEY);
 };
 
-// 💾 Guardar sesión según si se quiere recordar o no
 const saveStoredSession = (
   nextUser: User,
   token: string,
@@ -105,15 +93,10 @@ const saveStoredSession = (
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
-// 🚀 Provider principal de autenticación
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const initialSession = getStoredSession();
 
@@ -137,8 +120,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const storedSession = getStoredSession();
 
     if (!storedSession) {
-      setUser(null);
-      clearStoredSession();
+      logout();
       return null;
     }
 
@@ -153,21 +135,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       return currentUser;
     } catch {
-      setUser(null);
-      clearStoredSession();
+      logout();
       return null;
     }
-  }, [saveSession]);
+  }, [logout, saveSession]);
 
   useEffect(() => {
     let isMounted = true;
 
     const validateStoredSession = async () => {
       await refreshSession();
-
-      if (isMounted) {
-        setIsInitializing(false);
-      }
+      if (isMounted) setIsInitializing(false);
     };
 
     validateStoredSession();
@@ -183,9 +161,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     rememberSession = true
   ): Promise<User> => {
     const response = await api.login(email.trim().toLowerCase(), password);
-
     saveSession(response.user, response.token, rememberSession);
-
     return response.user;
   };
 
@@ -204,7 +180,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 
     saveSession(response.user, response.token, rememberSession);
-
     return response.user;
   };
 

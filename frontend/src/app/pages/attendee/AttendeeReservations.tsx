@@ -35,7 +35,13 @@ const statusClasses: Record<RegistrationStatus, string> = {
 };
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('es-MX', {
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return 'Fecha no disponible';
+  }
+
+  return parsedDate.toLocaleDateString('es-MX', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -44,7 +50,13 @@ const formatDate = (date: string) => {
 };
 
 const formatRegisteredAt = (date: string) => {
-  return new Date(date).toLocaleDateString('es-MX', {
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return 'Fecha no disponible';
+  }
+
+  return parsedDate.toLocaleDateString('es-MX', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -70,24 +82,29 @@ export const AttendeeReservations: React.FC = () => {
   const sortedReservations = useMemo(() => {
     return [...reservations].sort((a, b) => {
       const dateA = new Date(
-        `${a.conference.date}T${a.conference.time || '00:00'}`
+        `${a.activity.date}T${a.activity.time || '00:00'}`
       ).getTime();
 
       const dateB = new Date(
-        `${b.conference.date}T${b.conference.time || '00:00'}`
+        `${b.activity.date}T${b.activity.time || '00:00'}`
       ).getTime();
 
       return dateA - dateB;
     });
   }, [reservations]);
 
+  const activeReservations = reservations.filter(
+    (reservation) => reservation.status !== 'cancelada'
+  );
+
   const stats = useMemo(() => {
     return {
-      total: reservations.length,
-      checkedIn: reservations.filter((item) => item.checkedIn).length,
-      pendingCheckIn: reservations.filter((item) => !item.checkedIn).length,
+      total: activeReservations.length,
+      checkedIn: activeReservations.filter((item) => item.checkedIn).length,
+      pendingCheckIn: activeReservations.filter((item) => !item.checkedIn)
+        .length,
     };
-  }, [reservations]);
+  }, [activeReservations]);
 
   const handleCopyQr = async (qrCode: string) => {
     try {
@@ -100,7 +117,7 @@ export const AttendeeReservations: React.FC = () => {
 
   const handleCancelReservation = async (reservation: Reservation) => {
     const confirmed = window.confirm(
-      `¿Cancelar tu reserva para "${reservation.conference.title}"?`
+      `¿Cancelar tu inscripción para "${reservation.activity.title}"?`
     );
 
     if (!confirmed) return;
@@ -110,13 +127,13 @@ export const AttendeeReservations: React.FC = () => {
 
       await api.cancelReservation(reservation.id);
 
-      toast.success('Reserva cancelada correctamente.');
+      toast.success('Inscripción cancelada correctamente.');
       await refetch();
     } catch (err) {
       toast.error(
         err instanceof Error
           ? err.message
-          : 'No se pudo cancelar la reserva.'
+          : 'No se pudo cancelar la inscripción.'
       );
     } finally {
       setCancelingReservationId(null);
@@ -134,12 +151,12 @@ export const AttendeeReservations: React.FC = () => {
               <CalendarCheck className="w-8 h-8 text-blue-accent" />
 
               <h1 className="text-3xl lg:text-4xl text-gray-900">
-                Mis Reservas
+                Mis Inscripciones
               </h1>
             </div>
 
             <p className="text-lg text-gray-600">
-              Consulta tus conferencias reservadas, códigos QR y estado de
+              Consulta tus actividades registradas, códigos QR y estado de
               asistencia.
             </p>
           </div>
@@ -160,18 +177,18 @@ export const AttendeeReservations: React.FC = () => {
             </button>
 
             <Link
-              to="/attendee/events"
+              to="/attendee/programs"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white rounded-lg hover:shadow-lg transition-all"
             >
               <Ticket className="w-5 h-5" />
-              Reservar conferencia
+              Ver programas
             </Link>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <StatCard
-            label="Reservas activas"
+            label="Inscripciones activas"
             value={stats.total}
             icon={Ticket}
           />
@@ -194,7 +211,7 @@ export const AttendeeReservations: React.FC = () => {
             <Loader2 className="w-12 h-12 text-blue-accent animate-spin mx-auto mb-4" />
 
             <h2 className="text-xl text-gray-900 mb-2">
-              Cargando reservas
+              Cargando inscripciones
             </h2>
 
             <p className="text-gray-600">
@@ -209,7 +226,7 @@ export const AttendeeReservations: React.FC = () => {
 
             <div>
               <h2 className="text-lg mb-1">
-                No se pudieron cargar tus reservas
+                No se pudieron cargar tus inscripciones
               </h2>
 
               <p>{error}</p>
@@ -222,20 +239,20 @@ export const AttendeeReservations: React.FC = () => {
             <CalendarCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
 
             <h2 className="text-2xl text-gray-900 mb-2">
-              Aún no tienes reservas
+              Aún no tienes inscripciones
             </h2>
 
             <p className="text-gray-600 mb-6">
-              Explora las conferencias disponibles y reserva tu plaza para
-              generar tu código de acceso.
+              Explora los programas académicos y registra tu lugar en una
+              actividad para generar tu código de acceso.
             </p>
 
             <Link
-              to="/attendee/events"
+              to="/attendee/programs"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white rounded-lg hover:shadow-lg transition-all"
             >
               <Ticket className="w-5 h-5" />
-              Ver conferencias
+              Ver programas
             </Link>
           </div>
         )}
@@ -292,7 +309,8 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
   onCopyQr,
   onCancel,
 }) => {
-  const conference = reservation.conference;
+  const activity = reservation.activity;
+  const program = reservation.program;
 
   return (
     <article className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
@@ -324,45 +342,49 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
             </span>
           </div>
 
+          <p className="text-sm text-blue-accent mb-2">
+            {program?.name || 'Programa académico'}
+          </p>
+
           <h2 className="text-2xl text-gray-900 mb-3">
-            {conference.title}
+            {activity.title}
           </h2>
 
           <p className="text-gray-600 mb-5 line-clamp-2">
-            {conference.description}
+            {activity.description || 'Sin descripción disponible.'}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
             <InfoItem
               icon={CalendarCheck}
               label="Fecha"
-              value={formatDate(conference.date)}
+              value={formatDate(activity.date)}
             />
 
             <InfoItem
               icon={Clock}
               label="Hora"
-              value={`${conference.time}${
-                conference.endTime ? ` - ${conference.endTime}` : ''
+              value={`${activity.time}${
+                activity.endTime ? ` - ${activity.endTime}` : ''
               }`}
             />
 
             <InfoItem
               icon={MapPin}
               label="Ubicación"
-              value={conference.location}
+              value={activity.location}
             />
 
             <InfoItem
               icon={User}
-              label="Conferencista"
-              value={conference.speaker.name}
+              label="Ponente"
+              value={activity.speaker?.name || 'Por confirmar'}
             />
           </div>
 
           <div className="bg-muted rounded-xl p-4 mb-5">
             <p className="text-xs text-gray-500 mb-1">
-              Reservado el
+              Inscripción realizada el
             </p>
 
             <p className="text-sm text-gray-800">
@@ -380,19 +402,21 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
               Copiar código
             </button>
 
-            <button
-              type="button"
-              onClick={() => onCancel(reservation)}
-              disabled={isCanceling}
-              className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-700 border border-red-100 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-60"
-            >
-              {isCanceling ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Trash2 className="w-4 h-4" />
-              )}
-              Cancelar reserva
-            </button>
+            {reservation.status !== 'cancelada' && (
+              <button
+                type="button"
+                onClick={() => onCancel(reservation)}
+                disabled={isCanceling}
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-700 border border-red-100 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-60"
+              >
+                {isCanceling ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+                Cancelar inscripción
+              </button>
+            )}
           </div>
         </div>
 
@@ -421,7 +445,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
             </div>
           )}
 
-          {!reservation.checkedIn && (
+          {!reservation.checkedIn && reservation.status !== 'cancelada' && (
             <div className="mt-4 bg-blue-50 border border-blue-100 text-blue-700 rounded-lg p-3 text-sm text-center">
               <XCircle className="w-5 h-5 mx-auto mb-1" />
               Presenta este QR en el acceso.

@@ -1,10 +1,10 @@
 /**
- * Rol del usuario en el sistema
+ * Rol del usuario en el sistema.
  */
 export type UserRole = 'admin' | 'speaker' | 'attendee';
 
 /**
- * Usuario del sistema
+ * Usuario del sistema.
  */
 export interface User {
   id: string;
@@ -18,13 +18,22 @@ export interface User {
 
 export type ConferenceType = 'presencial' | 'virtual' | 'híbrida';
 
-export type ConferenceStatus = 'próxima' | 'en-curso' | 'finalizada' | 'cancelada';
+export type ConferenceStatus =
+  | 'próxima'
+  | 'en-curso'
+  | 'finalizada'
+  | 'cancelada';
 
+/**
+ * Modelo viejo de conferencia.
+ * Se conserva por compatibilidad con pantallas anteriores.
+ * Actualmente puede venir mapeado desde activities.
+ */
 export interface Conference {
   id: string;
   title: string;
   description: string;
-  date: string; // ISO 8601 format
+  date: string;
   time: string;
   endTime?: string | null;
   location: string;
@@ -41,6 +50,9 @@ export interface Conference {
   };
 }
 
+/**
+ * Modelo actual de programa.
+ */
 export interface Program {
   id: string;
   name: string;
@@ -57,6 +69,21 @@ export interface Program {
   totalAttendees?: number;
 }
 
+/**
+ * Versión corta del programa cuando viene anidado dentro de una actividad o registro.
+ */
+export interface ActivityProgram {
+  id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+  location?: string;
+  imageUrl?: string;
+  status?: string;
+}
+
 export interface ActivitySpeaker {
   id: string;
   name: string;
@@ -66,6 +93,9 @@ export interface ActivitySpeaker {
   organization: string;
 }
 
+/**
+ * Modelo actual de actividad.
+ */
 export interface Activity {
   id: string;
   title: string;
@@ -78,8 +108,8 @@ export interface Activity {
   location: string;
 
   activityType: string;
-  modality: string;
-  status: string;
+  modality: ConferenceType | string;
+  status: ConferenceStatus | string;
 
   capacity: number;
   registeredCount: number;
@@ -95,10 +125,8 @@ export interface Activity {
   tags?: string[];
 
   speaker: ActivitySpeaker;
-  program: Program;
+  program: ActivityProgram;
 }
-
-
 
 export interface Speaker {
   id: string;
@@ -123,8 +151,18 @@ export type RegistrationStatus = 'confirmada' | 'pendiente' | 'cancelada';
 
 export interface Registration {
   id: string;
-  attendeeId: string;
-  conferenceId: string;
+
+  /**
+   * Modelo viejo.
+   */
+  conferenceId?: string;
+
+  /**
+   * Modelo actual.
+   */
+  activityId?: string;
+
+  attendeeId?: string;
   registeredAt: string;
   status: RegistrationStatus;
   qrCode: string;
@@ -133,12 +171,29 @@ export interface Registration {
 export interface Reservation extends Registration {
   checkedIn: boolean;
   checkedInAt: string | null;
-  attendee: {
-    id: string;
+
+  attendee?: {
+    id?: string;
     name: string;
     email: string;
   };
+
+  /**
+   * Modelo viejo.
+   * Se mantiene para pantallas antiguas como certificados o historial.
+   */
   conference: Conference;
+
+  /**
+   * Modelo actual.
+   * Lo usa AttendeeReservations.tsx.
+   */
+  activity: Activity;
+
+  /**
+   * Programa asociado a la actividad.
+   */
+  program: ActivityProgram;
 }
 
 export interface CheckInResponse {
