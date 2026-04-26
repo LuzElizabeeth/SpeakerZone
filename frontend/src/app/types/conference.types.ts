@@ -2,7 +2,6 @@
  * Rol del usuario en el sistema.
  */
 export type UserRole = 'admin' | 'speaker' | 'attendee';
-
 /**
  * Usuario del sistema.
  */
@@ -168,9 +167,13 @@ export interface Registration {
   qrCode: string;
 }
 
-export interface Reservation extends Registration {
+export interface Reservation {
+  id: string;
+  status: RegistrationStatus;
+  qrCode: string;
+  registeredAt: string;
   checkedIn: boolean;
-  checkedInAt: string | null;
+  checkedInAt?: string | null;
 
   attendee?: {
     id?: string;
@@ -179,21 +182,19 @@ export interface Reservation extends Registration {
   };
 
   /**
-   * Modelo viejo.
-   * Se mantiene para pantallas antiguas como certificados o historial.
+   * Compatibilidad con reservas antiguas
    */
-  conference: Conference;
+  conference?: Conference;
 
   /**
-   * Modelo actual.
-   * Lo usa AttendeeReservations.tsx.
+   * Reservas nuevas por actividad
    */
-  activity: Activity;
+  activity?: Activity;
 
   /**
-   * Programa asociado a la actividad.
+   * Programa relacionado con la actividad
    */
-  program: ActivityProgram;
+  program?: Program;
 }
 
 export interface CheckInResponse {

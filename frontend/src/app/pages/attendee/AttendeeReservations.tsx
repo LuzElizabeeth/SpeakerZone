@@ -80,18 +80,21 @@ export const AttendeeReservations: React.FC = () => {
   >(null);
 
   const sortedReservations = useMemo(() => {
-    return [...reservations].sort((a, b) => {
-      const dateA = new Date(
-        `${a.activity.date}T${a.activity.time || '00:00'}`
-      ).getTime();
+  return [...reservations].sort((a, b) => {
+    const itemA = a.conference || a.activity;
+    const itemB = b.conference || b.activity;
 
-      const dateB = new Date(
-        `${b.activity.date}T${b.activity.time || '00:00'}`
-      ).getTime();
+    const dateA = new Date(
+      `${itemA?.date || ''}T${itemA?.time || '00:00'}`
+    ).getTime();
 
-      return dateA - dateB;
-    });
-  }, [reservations]);
+    const dateB = new Date(
+      `${itemB?.date || ''}T${itemB?.time || '00:00'}`
+    ).getTime();
+
+    return dateA - dateB;
+  });
+}, [reservations]);
 
   const activeReservations = reservations.filter(
     (reservation) => reservation.status !== 'cancelada'
@@ -117,7 +120,11 @@ export const AttendeeReservations: React.FC = () => {
 
   const handleCancelReservation = async (reservation: Reservation) => {
     const confirmed = window.confirm(
-      `¿Cancelar tu inscripción para "${reservation.activity.title}"?`
+      `¿Cancelar tu reserva para "${
+        reservation.conference?.title ||
+        reservation.activity?.title ||
+        'esta actividad'
+      }"?`
     );
 
     if (!confirmed) return;
@@ -309,8 +316,10 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
   onCopyQr,
   onCancel,
 }) => {
-  const activity = reservation.activity;
-  const program = reservation.program;
+  const item = reservation.conference || reservation.activity;
+  const program =
+  reservation.program ||
+  reservation.activity?.program;
 
   return (
     <article className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
@@ -347,38 +356,41 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
           </p>
 
           <h2 className="text-2xl text-gray-900 mb-3">
-            {activity.title}
+            {item?.title || 'Actividad sin título'}
           </h2>
 
           <p className="text-gray-600 mb-5 line-clamp-2">
-            {activity.description || 'Sin descripción disponible.'}
+            {item?.description || 'Sin descripción disponible'}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
             <InfoItem
               icon={CalendarCheck}
               label="Fecha"
-              value={formatDate(activity.date)}
+              value={item?.date ? formatDate(item.date) : 'Fecha pendiente'}
             />
 
             <InfoItem
               icon={Clock}
               label="Hora"
-              value={`${activity.time}${
-                activity.endTime ? ` - ${activity.endTime}` : ''
-              }`}
+              value={`${item?.time || '--'}${
+          item?.endTime ? ` - ${item.endTime}` : ''
+        }`}
             />
 
             <InfoItem
               icon={MapPin}
               label="Ubicación"
-              value={activity.location}
+              value={item?.location || 'Ubicación pendiente'}
             />
 
             <InfoItem
               icon={User}
-              label="Ponente"
-              value={activity.speaker?.name || 'Por confirmar'}
+              label="Conferencista"
+              value={
+              item?.speaker?.name ||
+              'Sin conferencista asignado'
+              }
             />
           </div>
 

@@ -51,6 +51,7 @@ const safeParseUser = (value: string | null): User | null => {
   }
 };
 
+// 🔍 Obtener sesión guardada
 const getStoredSession = (): StoredSession | null => {
   const localToken = localStorage.getItem(AUTH_TOKEN_KEY);
   const localUser = safeParseUser(localStorage.getItem(AUTH_USER_KEY));
@@ -69,6 +70,7 @@ const getStoredSession = (): StoredSession | null => {
   return null;
 };
 
+// 🧹 Limpiar sesión
 const clearStoredSession = () => {
   localStorage.removeItem(AUTH_USER_KEY);
   localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -76,6 +78,7 @@ const clearStoredSession = () => {
   sessionStorage.removeItem(AUTH_TOKEN_KEY);
 };
 
+// 💾 Guardar sesión
 const saveStoredSession = (
   nextUser: User,
   token: string,

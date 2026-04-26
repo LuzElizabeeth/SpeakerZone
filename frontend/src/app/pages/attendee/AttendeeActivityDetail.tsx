@@ -65,12 +65,56 @@ export const AttendeeActivityDetail: React.FC = () => {
     if (!activity) return null;
 
     if (!activity.requiresRegistration) {
-      return (
-        <Button disabled className="w-full">
-          No requiere registro
-        </Button>
-      );
+  return (
+    <div className="space-y-4">
+      <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+
+          <div>
+            <p className="text-sm font-medium text-blue-700">
+              Esta actividad no requiere registro previo
+            </p>
+
+            <p className="text-sm text-blue-600 mt-1">
+              Puedes asistir libremente, pero puedes confirmar tu
+              asistencia para que quede registrada en tu historial,
+              reservas y certificados.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <Button
+        className="w-full bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end text-white"
+        onClick={async () => {
+  try {
+    await api.registerToActivity(activity.id);
+
+    const goToReservations = window.confirm(
+      'Asistencia confirmada exitosamente.\n\nTu actividad fue agregada a tus reservas.\n\n¿Deseas ir a ver tus reservas ahora?'
+    );
+
+    if (goToReservations) {
+      navigate('/attendee/reservations');
     }
+  } catch (error) {
+    console.error(
+      'Error al confirmar asistencia:',
+      error
+    );
+
+    window.alert(
+      'No se pudo confirmar la asistencia. Intenta nuevamente.'
+    );
+  }
+}}
+      >
+        Confirmar mi asistencia
+      </Button>
+    </div>
+  );
+}
 
     if (activity.registeredCount >= activity.capacity) {
       return (
