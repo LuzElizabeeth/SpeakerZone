@@ -17,32 +17,58 @@ const { Pool } = pkg;
 
 // ✅ Detecta si existe DATABASE_URL
 const useDatabaseUrl = Boolean(process.env.DATABASE_URL);
+const dbPassword = process.env.DB_PASSWORD || process.env.DB_PASS;
+const dbSsl = process.env.DB_SSL === "true";
+
+if (!useDatabaseUrl && !dbPassword) {
+  throw new Error("DB_PASSWORD o DB_PASS no está definido");
+}
 
 const pool = new Pool(
   useDatabaseUrl
     ? {
         connectionString: process.env.DATABASE_URL,
+<<<<<<< Updated upstream
         ssl: { rejectUnauthorized: false }, // Render requiere SSL
+=======
+        ssl: dbSsl
+          ? {
+              rejectUnauthorized: false,
+            }
+          : false,
+>>>>>>> Stashed changes
       }
     : {
         user: process.env.DB_USER || "postgres",
         host: process.env.DB_HOST || "localhost",
         database: process.env.DB_NAME || "speakerzone_tecnm",
-        password: process.env.DB_PASSWORD,
+        password: dbPassword,
         port: Number(process.env.DB_PORT || 5432),
+        ssl: dbSsl
+          ? {
+              rejectUnauthorized: false,
+            }
+          : false,
       }
 );
 
+<<<<<<< Updated upstream
 // ✅ Solo valida DB_PASSWORD si no usas DATABASE_URL
 if (!useDatabaseUrl && !process.env.DB_PASSWORD) {
   throw new Error("DB_PASSWORD no está definido");
 }
 
+=======
+>>>>>>> Stashed changes
 const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://speakerzone.netlify.app"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:8080",
+      "https://speakerzone.netlify.app",
+    ],
     credentials: true,
   })
 );
@@ -59,7 +85,7 @@ app.use("/api/registrations", registrationRoutes(pool));
 app.use("/api/users", userRoutes(pool));
 
 app.get("/", (_req, res) => {
-  res.send("Hub académico backend funcionando ✅");
+  res.send("SpeakerZone backend funcionando ✅");
 });
 
 app.get("/api/db-check", async (_req, res) => {

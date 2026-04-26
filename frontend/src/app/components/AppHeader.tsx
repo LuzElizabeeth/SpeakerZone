@@ -14,17 +14,15 @@ import {
   Settings,
   BarChart3,
   QrCode,
-  FileText,
   History,
+  MapPin,
 } from 'lucide-react';
-
 import { useAuth } from '../context/AuthContext';
 
 export const AppHeader: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleLogout = () => {
@@ -32,42 +30,36 @@ export const AppHeader: React.FC = () => {
     navigate('/');
   };
 
-  const getHomeRoute = () => {
-    if (!isAuthenticated || !user) {
-      return '/';
-    }
+  const getUserInitials = () => {
+    if (!user?.name) return 'SZ';
 
-    switch (user.role) {
-      case 'admin':
-        return '/admin/dashboard';
+    return user.name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('');
+  };
 
-      case 'speaker':
-        return '/speaker/dashboard';
+  const getRoleLabel = () => {
+    if (user?.role === 'attendee') return 'Asistente';
+    if (user?.role === 'speaker') return 'Conferencista';
+    if (user?.role === 'admin') return 'Administrador';
+    return 'Usuario';
+  };
 
-      case 'attendee':
-      default:
-        return '/attendee/dashboard';
-    }
+  const getProfilePath = () => {
+    if (user?.role === 'speaker') return '/speaker/profile';
+    if (user?.role === 'admin') return '/admin/dashboard';
+    return '/attendee/profile';
   };
 
   const getNavLinks = () => {
     if (!isAuthenticated) {
       return [
-        {
-          label: 'Conferencias',
-          path: '/dashboard',
-          icon: Calendar,
-        },
-        {
-          label: 'Conferencistas',
-          path: '/speakers',
-          icon: Users,
-        },
-        {
-          label: 'Acerca de',
-          path: '/about',
-          icon: Info,
-        },
+        { label: 'Conferencias', path: '/dashboard', icon: Calendar },
+        { label: 'Conferencistas', path: '/speakers', icon: Users },
+        { label: 'Acerca de', path: '/about', icon: Info },
       ];
     }
 
@@ -79,37 +71,6 @@ export const AppHeader: React.FC = () => {
             path: '/admin/dashboard',
             icon: LayoutDashboard,
           },
-          {
-            label: 'Eventos',
-            path: '/admin/events',
-            icon: Calendar,
-          },
-          {
-            label: 'Conferencias',
-            path: '/admin/conferences',
-            icon: Award,
-          },
-          {
-            label: 'Conferencistas',
-            path: '/admin/speakers',
-            icon: Users,
-          },
-          {
-            label: 'Asistentes',
-            path: '/admin/attendees',
-            icon: Users,
-          },
-          {
-            label: 'Escáner QR',
-            path: '/admin/scanner',
-            icon: QrCode,
-          },
-          {
-            label: 'Estadísticas',
-            path: '/admin/stats',
-            icon: BarChart3,
-          },
-          { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
           { label: 'Usuarios', path: '/admin/users', icon: Users },
           { label: 'Eventos', path: '/admin/events', icon: Calendar },
           { label: 'Conferencias', path: '/admin/conferences', icon: Award },
@@ -131,21 +92,9 @@ export const AppHeader: React.FC = () => {
             path: '/speaker/conferences',
             icon: Calendar,
           },
-          {
-            label: 'Asistentes',
-            path: '/speaker/attendees',
-            icon: Users,
-          },
-          {
-            label: 'Certificados',
-            path: '/speaker/certificates',
-            icon: Award,
-          },
-          {
-            label: 'Mi Perfil',
-            path: '/speaker/profile',
-            icon: User,
-          },
+          { label: 'Asistentes', path: '/speaker/attendees', icon: Users },
+          { label: 'Certificados', path: '/speaker/certificates', icon: Award },
+          { label: 'Mi Perfil', path: '/speaker/profile', icon: User },
         ];
 
       case 'attendee':
@@ -159,62 +108,44 @@ export const AppHeader: React.FC = () => {
           {
             label: 'Programas',
             path: '/attendee/programs',
-            icon: FileText,
+            icon: MapPin,
           },
           {
-            label: 'Mis Inscripciones',
+            label: 'Mis Reservas',
             path: '/attendee/reservations',
             icon: CalendarCheck,
           },
-          {
-            label: 'Mi QR',
-            path: '/attendee/qr',
-            icon: QrCode,
-          },
+          { label: 'Mi QR', path: '/attendee/qr', icon: QrCode },
           {
             label: 'Certificados',
             path: '/attendee/certificates',
             icon: Award,
           },
-          {
-            label: 'Historial',
-            path: '/attendee/history',
-            icon: History,
-          },
+          { label: 'Historial', path: '/attendee/history', icon: History },
         ];
     }
   };
 
   const navLinks = getNavLinks();
 
-  const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-
-    return (
-      location.pathname === path ||
-      location.pathname.startsWith(`${path}/`)
-    );
-  };
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link
-            to={getHomeRoute()}
-            className="flex items-center gap-2 flex-shrink-0"
-          >
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-gradient-start to-blue-gradient-end rounded-lg flex items-center justify-center">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl text-gray-900 hidden sm:block">Hub académico</span>
+
+            <span className="text-xl text-gray-900 hidden sm:block">
+              SpeakerZone
+            </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-3 flex-1 justify-center">
+          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
             {navLinks.map((link) => {
               const Icon = link.icon;
 
@@ -235,34 +166,31 @@ export const AppHeader: React.FC = () => {
             })}
           </nav>
 
-          {/* User Menu */}
           <div className="flex items-center gap-4">
             {isAuthenticated && user ? (
               <div className="relative">
                 <button
-                  onClick={() =>
-                    setShowUserMenu(!showUserMenu)
-                  }
+                  type="button"
+                  onClick={() => setShowUserMenu((prev) => !prev)}
                   className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  aria-haspopup="menu"
+                  aria-label="Abrir menú de usuario"
                 >
-                  <img
-                    src={user.avatarUrl || '/default-avatar.png'}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-blue-light text-blue-accent flex items-center justify-center text-xs">
+                      {getUserInitials()}
+                    </div>
+                  )}
 
                   <div className="hidden sm:block text-left">
-                    <p className="text-sm text-gray-900">
-                      {user.name}
-                    </p>
-
-                    <p className="text-xs text-gray-500 capitalize">
-                      {user.role === 'attendee'
-                        ? 'Asistente'
-                        : user.role === 'speaker'
-                        ? 'Conferencista'
-                        : 'Administrador'}
-                    </p>
+                    <p className="text-sm text-gray-900">{user.name}</p>
+                    <p className="text-xs text-gray-500">{getRoleLabel()}</p>
                   </div>
 
                   <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -270,36 +198,23 @@ export const AppHeader: React.FC = () => {
 
                 {showUserMenu && (
                   <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() =>
-                        setShowUserMenu(false)
-                      }
+                    <button
+                      type="button"
+                      className="fixed inset-0 z-40 cursor-default"
+                      onClick={() => setShowUserMenu(false)}
+                      aria-label="Cerrar menú de usuario"
                     />
 
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                       <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm text-gray-900">
-                          {user.name}
-                        </p>
-
-                        <p className="text-xs text-gray-500">
-                          {user.email}
-                        </p>
+                        <p className="text-sm text-gray-900">{user.name}</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
 
                       <Link
-                        to={
-                          user.role === 'speaker'
-                            ? '/speaker/profile'
-                            : user.role === 'admin'
-                            ? '/admin/dashboard'
-                            : '/attendee/profile'
-                        }
+                        to={getProfilePath()}
                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        onClick={() =>
-                          setShowUserMenu(false)
-                        }
+                        onClick={() => setShowUserMenu(false)}
                       >
                         <User className="w-4 h-4" />
                         Mi Perfil
@@ -308,9 +223,7 @@ export const AppHeader: React.FC = () => {
                       <Link
                         to="/settings"
                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        onClick={() =>
-                          setShowUserMenu(false)
-                        }
+                        onClick={() => setShowUserMenu(false)}
                       >
                         <Settings className="w-4 h-4" />
                         Configuración
@@ -318,6 +231,7 @@ export const AppHeader: React.FC = () => {
 
                       <div className="border-t border-gray-100 mt-2 pt-2">
                         <button
+                          type="button"
                           onClick={() => {
                             setShowUserMenu(false);
                             handleLogout();
@@ -343,7 +257,6 @@ export const AppHeader: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         <nav className="md:hidden flex items-center gap-2 overflow-x-auto pb-3 pt-2 -mx-4 px-4 scrollbar-hide">
           {navLinks.map((link) => {
             const Icon = link.icon;
@@ -368,6 +281,3 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
-
-export default AppHeader;
-

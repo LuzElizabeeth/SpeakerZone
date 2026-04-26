@@ -113,6 +113,10 @@ export const router = createBrowserRouter([
     Component: withAuth(AdminDashboard, ['admin']),
   },
   {
+    path: '/admin/users',
+    Component: withAuth(AdminUsers, ['admin']),
+  },
+  {
     path: '/admin/events',
     Component: withAuth(AdminEvents, ['admin']),
   },
@@ -136,12 +140,7 @@ export const router = createBrowserRouter([
     path: '/admin/stats',
     Component: withAuth(AdminStats, ['admin']),
   },
-  {
-    path: '/admin/users',
-    Component: withAuth(AdminUsers, ['admin']),
-  },
 
-  // Attendee routes
   {
     path: '/attendee/dashboard',
     Component: withAuth(AttendeeDashboard, ['attendee']),
@@ -150,6 +149,34 @@ export const router = createBrowserRouter([
     path: '/attendee/profile',
     Component: withAuth(AttendeeProfile, ['attendee']),
   },
+
+
+  {
+    path: '/attendee/programs',
+    Component: withAuth(AttendeeProgramList, ['attendee']),
+  },
+  {
+    path: '/attendee/programs/:id',
+    Component: withAuth(AttendeeProgramDetail, ['attendee']),
+  },
+  {
+    path: '/attendee/activities/:id',
+    Component: withAuth(AttendeeActivityDetail, ['attendee']),
+  },
+  {
+    path: '/attendee/calendar',
+    Component: withAuth(AttendeeProgramCalendar, ['attendee']),
+  },
+  {
+    path: '/attendee/register/:id',
+    Component: withAuth(AttendeeRegistrationFlow, ['attendee']),
+  },
+
+  {
+    path: '/attendee/events',
+    Component: withAuth(AttendeeProgramList, ['attendee']),
+  },
+
   {
     path: '/attendee/reservations',
     Component: withAuth(AttendeeReservations, ['attendee']),
@@ -166,27 +193,6 @@ export const router = createBrowserRouter([
     path: '/attendee/history',
     Component: withAuth(AttendeeHistory, ['attendee']),
   },
-
-  {
-  path: '/attendee/programs',
-  Component: withAuth(AttendeeProgramList, ['attendee']),
-},
-{
-  path: '/attendee/programs/:id',
-  Component: withAuth(AttendeeProgramDetail, ['attendee']),
-},
-{
-  path: '/attendee/activities/:id',
-  Component: withAuth(AttendeeActivityDetail, ['attendee']),
-},
-{
-  path: '/attendee/calendar',
-  Component: withAuth(AttendeeProgramCalendar, ['attendee']),
-},
-{
-  path: '/attendee/register/:id',
-  Component: withAuth(AttendeeRegistrationFlow, ['attendee']),
-},
 
   {
     path: '*',

@@ -8,7 +8,6 @@ import {
   LogIn,
   Mail,
   User,
-  UserPlus,
   CalendarCheck,
   QrCode,
   ShieldCheck,
@@ -204,7 +203,7 @@ export const Login: React.FC = () => {
               <LogIn className="w-7 h-7 text-white" />
             </div>
 
-            <span className="text-2xl text-gray-900">Hub académico</span>
+            <span className="text-2xl text-gray-900">SpeakerZone</span>
           </Link>
 
           <h1 className="text-3xl mb-2 text-gray-900">
@@ -290,7 +289,7 @@ export const Login: React.FC = () => {
                   onChange={handlePasswordChange}
                   placeholder="••••••••"
                   className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-accent focus:border-transparent outline-none transition-all"
-                  autoComplete={isLogin ? 'current-password' : 'new-password'}
+                  autoComplete="current-password"
                 />
 
                 <button
@@ -347,40 +346,6 @@ export const Login: React.FC = () => {
             </button>
           </form>
 
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">
-                Acceso mediante cuenta registrada
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Inicio con Google no disponible en esta versión"
-              className="flex items-center justify-center gap-2 py-3 px-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
-            >
-              Google
-            </button>
-
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Inicio con GitHub no disponible en esta versión"
-              className="flex items-center justify-center gap-2 py-3 px-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed"
-            >
-              GitHub
-            </button>
-          </div>
-
           <p className="text-center text-sm text-gray-600 mt-8">
             {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}{' '}
 
@@ -403,7 +368,7 @@ export const Login: React.FC = () => {
 
         <div className="relative z-10 max-w-md text-white">
           <h2 className="text-4xl mb-6">
-            Gestiona tu experiencia en Hub académico
+            Gestiona tu experiencia en SpeakerZone
           </h2>
 
           <p className="text-xl text-white/90 mb-8">
@@ -446,15 +411,6 @@ export const Login: React.FC = () => {
                 </p>
               </div>
             </div>
-          </div>
-
-          <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-5">
-            <h3 className="text-lg mb-2">Acceso administrativo</h3>
-
-            <p className="text-white/80 text-sm">
-              Las cuentas internas del sistema son administradas directamente
-              desde el panel autorizado.
-            </p>
           </div>
         </div>
       </div>
