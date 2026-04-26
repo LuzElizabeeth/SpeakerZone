@@ -12,6 +12,8 @@ const VerifyEmail: React.FC = () => {
   const [message, setMessage] = useState('Validando enlace de verificación...');
 
   useEffect(() => {
+    // NOTE for team: this page is the web-facing confirmation flow.
+    // Email links should point here: https://hubacademico.mx/verify-email?token=...
     const token = searchParams.get('token');
 
     if (!token) {

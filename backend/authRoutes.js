@@ -89,6 +89,8 @@ const authRoutes = (pool) => {
     return result.rows.length > 0;
   };
 
+  // NOTE for team: frontend /verify-email now confirms via this endpoint.
+  // If production returns 404 here, backend deploy is not updated yet.
   router.post("/verify-email-token", async (req, res) => {
     const token =
       typeof req.body?.token === "string" ? req.body.token.trim() : "";
