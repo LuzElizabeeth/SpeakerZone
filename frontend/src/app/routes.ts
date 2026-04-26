@@ -4,6 +4,7 @@ import { createBrowserRouter } from 'react-router';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
+import VerifyEmail from './pages/VerifyEmail';
 import Speakers from './pages/Speakers';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
@@ -71,6 +72,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     Component: Login,
+  },
+  {
+    path: '/verify-email',
+    Component: VerifyEmail,
   },
   {
     path: '/speakers',

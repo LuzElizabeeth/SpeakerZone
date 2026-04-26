@@ -24,7 +24,7 @@ interface AuthContextType {
     password: string,
     role?: UserRole,
     rememberSession?: boolean
-  ) => Promise<User>;
+  ) => Promise<{ requiresEmailVerification: boolean; user: User | null }>;
   logout: () => void;
   refreshSession: () => Promise<User | null>;
   isAuthenticated: boolean;
@@ -44,7 +44,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // 🔒 Parse seguro
 const safeParseUser = (value: string | null): User | null => {
   if (!value || value === 'undefined') return null;
-
   try {
     return JSON.parse(value) as User;
   } catch {
@@ -175,7 +174,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     password: string,
     role: UserRole = 'attendee',
     rememberSession = true
-  ): Promise<User> => {
+  ): Promise<{ requiresEmailVerification: boolean; user: User | null }> => {
     const response = await api.register(
       name.trim(),
       email.trim().toLowerCase(),
@@ -183,8 +182,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       role
     );
 
+    if (response.requiresEmailVerification) {
+      logout();
+      return { requiresEmailVerification: true, user: null };
+    }
+
+    if (!response.user || !response.token) {
+      throw new Error('Respuesta inválida del servidor al registrar usuario.');
+    }
+
     saveSession(response.user, response.token, rememberSession);
-    return response.user;
+    return { requiresEmailVerification: false, user: response.user };
   };
 
   return (

@@ -15,6 +15,10 @@ CREATE TABLE usuarios (
   password VARCHAR(255) NOT NULL,
   rol VARCHAR(30) NOT NULL CHECK (rol IN ('asistente', 'conferencista', 'administrativo')),
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+  email_verification_token TEXT,
+  email_verification_expires TIMESTAMP,
+  email_verification_last_sent_at TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

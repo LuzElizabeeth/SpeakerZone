@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import {
   ArrowRight,
   Eye,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { UserRole } from '../types/conference.types';
 
 interface LoginLocationState {
@@ -46,6 +47,7 @@ const canAccessPathByRole = (role: UserRole, path?: string) => {
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { login, register, user, isAuthenticated, isInitializing } = useAuth();
 
@@ -56,12 +58,35 @@ export const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberSession, setRememberSession] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [resendCooldownSeconds, setResendCooldownSeconds] = useState(0);
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
   });
+
+  useEffect(() => {
+    const verifiedStatus = searchParams.get('verified');
+    const reason = searchParams.get('reason');
+
+    if (!verifiedStatus) return;
+
+    if (verifiedStatus === 'ok') {
+      toast.success('Correo verificado correctamente. Ya puedes iniciar sesión.');
+    } else {
+      const reasonMessage =
+        reason === 'token_expirado'
+          ? 'El enlace de verificación expiró o ya no es válido.'
+          : reason === 'token_invalido'
+            ? 'El enlace de verificación no es válido.'
+            : 'No se pudo verificar el correo en este momento.';
+      toast.error(reasonMessage);
+    }
+
+    setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!isInitializing && isAuthenticated && user) {
@@ -72,6 +97,18 @@ export const Login: React.FC = () => {
       navigate(targetPath || getHomePathByRole(user.role), { replace: true });
     }
   }, [fromPath, isAuthenticated, isInitializing, navigate, user]);
+
+  useEffect(() => {
+    if (resendCooldownSeconds <= 0) return;
+
+    const timer = window.setInterval(() => {
+      setResendCooldownSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [resendCooldownSeconds]);
 
   const redirectAfterAuth = (role: UserRole) => {
     const targetPath = canAccessPathByRole(role, fromPath)
@@ -161,7 +198,7 @@ export const Login: React.FC = () => {
         toast.success(`Bienvenido, ${authenticatedUser.name}.`);
         redirectAfterAuth(authenticatedUser.role);
       } else {
-        const registeredUser = await register(
+        const registerResult = await register(
           formData.name.trim(),
           formData.email.trim().toLowerCase(),
           formData.password,
@@ -169,8 +206,20 @@ export const Login: React.FC = () => {
           rememberSession
         );
 
+        if (registerResult.requiresEmailVerification) {
+          toast.success(
+            'Cuenta creada. Revisa tu correo y confirma la verificación para iniciar sesión.'
+          );
+          resetFormState(true);
+          return;
+        }
+
+        if (!registerResult.user) {
+          throw new Error('No se pudo completar el registro.');
+        }
+
         toast.success('Cuenta creada correctamente.');
-        redirectAfterAuth(registeredUser.role);
+        redirectAfterAuth(registerResult.user.role);
       }
     } catch (error) {
       toast.error(
@@ -180,6 +229,39 @@ export const Login: React.FC = () => {
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    const email = formData.email.trim().toLowerCase();
+    if (!email) {
+      toast.error('Escribe tu correo para reenviar la verificación.');
+      return;
+    }
+
+    setIsResendingVerification(true);
+    try {
+      const response = await api.resendVerificationEmail(email);
+      toast.success(response.message);
+      if (response.retryAfterSeconds) {
+        setResendCooldownSeconds(response.retryAfterSeconds);
+      } else {
+        setResendCooldownSeconds(60);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        const match = error.message.match(/(\d+)\s*segundos?/i);
+        if (match) {
+          setResendCooldownSeconds(Number(match[1]));
+        }
+      }
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo reenviar el correo de verificación.'
+      );
+    } finally {
+      setIsResendingVerification(false);
     }
   };
 
@@ -343,6 +425,26 @@ export const Login: React.FC = () => {
                   : 'Crear cuenta'}
 
               {!isLoading && <ArrowRight className="w-5 h-5" />}
+            </button>
+
+            {!isLogin && (
+              <p className="text-xs text-gray-500">
+                Si no recibes el correo de verificación, primero crea la cuenta
+                y luego usa la opción de reenvío.
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              disabled={isResendingVerification || resendCooldownSeconds > 0}
+              className="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isResendingVerification
+                ? 'Reenviando verificación...'
+                : resendCooldownSeconds > 0
+                  ? `Reintentar en ${resendCooldownSeconds}s`
+                  : 'Reenviar correo de verificación'}
             </button>
           </form>
 
